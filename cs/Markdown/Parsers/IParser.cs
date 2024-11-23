@@ -4,5 +4,11 @@ namespace Markdown.Parsers;
 
 public interface IParser
 {
-    List<MarkdownTag> ParseMarkdownTags(string markdownLine);
+    /// <summary>
+    /// Метод, который парсит все тэги в строке.
+    /// Найденные тэги будут добавляться в лист, чтобы была возможность получить доступ к уже добавленным(внешним) тэгам.
+    /// </summary>
+    /// <param name="markdownLineParagraph"> Абзац строки </param>
+    /// <returns> Список тэгов </returns>
+    List<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph);
 }
