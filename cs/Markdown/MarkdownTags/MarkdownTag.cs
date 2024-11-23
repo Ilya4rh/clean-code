@@ -2,22 +2,19 @@
 
 public abstract class MarkdownTag
 {
+    // Тип markdown тэга
+    public MarkdownTagType TagType;
     // Позиция тэга в строке
-    private int position;
+    public int Position;
     
-    public MarkdownTag(int position)
+    public MarkdownTag(MarkdownTagType tagType, int position)
     {
-        this.position = position;
+        TagType = tagType;
+        Position = position;
     }
 
     /// <summary>
     /// Длина тэга
     /// </summary>
     public abstract int Length { get; }
-    
-    /// <summary>
-    /// Проверка валидности тэга
-    /// </summary>
-    /// <returns></returns>
-    public abstract bool IsValid(string markdownLine);
 }
