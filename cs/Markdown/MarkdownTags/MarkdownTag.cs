@@ -6,15 +6,13 @@ public abstract class MarkdownTag
     public MarkdownTagType TagType;
     // Позиция тэга в строке
     public int Position;
+    // Длина тэга
+    public int Length;
     
-    public MarkdownTag(MarkdownTagType tagType, int position)
+    public MarkdownTag(MarkdownTagType tagType, int position, int length)
     {
         TagType = tagType;
         Position = position;
+        Length = length;
     }
-
-    /// <summary>
-    /// Длина тэга
-    /// </summary>
-    public abstract int Length { get; }
 }

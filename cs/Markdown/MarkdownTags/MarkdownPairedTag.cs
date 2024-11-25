@@ -7,10 +7,9 @@ public class MarkdownPairedTag : MarkdownTag
 {
     public bool IsClosedTag;
     
-    public MarkdownPairedTag(MarkdownTagType tagType, int position, bool isClosedTag = false) : base(tagType, position)
+    public MarkdownPairedTag(MarkdownTagType tagType, int position, int length, bool isClosedTag = false) :
+        base(tagType, position, length)
     {
         IsClosedTag = isClosedTag;
     }
-
-    public override int Length { get; }
 }

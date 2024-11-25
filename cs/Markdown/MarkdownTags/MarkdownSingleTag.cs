@@ -5,9 +5,7 @@
 /// </summary>
 public class MarkdownSingleTag : MarkdownTag
 {
-    public MarkdownSingleTag(MarkdownTagType tagType, int position) : base(tagType, position)
+    public MarkdownSingleTag(MarkdownTagType tagType, int position, int length) : base(tagType, position, length)
     {
     }
-
-    public override int Length { get; }
 }
