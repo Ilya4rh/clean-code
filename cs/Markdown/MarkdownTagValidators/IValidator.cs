@@ -5,27 +5,18 @@ namespace Markdown.MarkdownTagValidators;
 public interface IValidator
 {
     /// <summary>
-    /// Проверяет валидность одиночного тэга
+    /// Проверяет валидность тэга 
     /// </summary>
-    /// <param name="tagType"> Тип тэга </param>
+    /// <param name="tagType"> Тип тэга, который проверяется</param>
     /// <param name="positionOnLine"> Позиция тэга в строке </param>
     /// <param name="line"> Строка, в которой находится тэг </param>
-    /// <returns></returns>
-    bool IsValidSingleTag(MarkdownTagType tagType, int positionOnLine, string line);
-
-    /// <summary>
-    /// Проверяет валидность парного тэга
-    /// </summary>
-    /// <param name="tagType"> Тип тэга </param>
-    /// <param name="positionOpenTagOnLine"> Позиция открывающего тэга в строке </param>
-    /// <param name="positionCloseTagOnLine"> Позиция закрывающего тэга в строке </param>
-    /// <param name="line"> Строк, в которой находятся тэги </param>
+    /// <param name="positionCloseTagOnLine"> Позиция закрывающего тэга, если он парный </param>
     /// <param name="externalTagType"> Тип внешнего тэга, для текущего </param>
     /// <returns></returns>
-    bool IsValidPairedTag(
+    bool IsValidTag(
         MarkdownTagType tagType, 
-        int positionOpenTagOnLine, 
-        int positionCloseTagOnLine, 
+        int positionOnLine, 
         string line,
+        int? positionCloseTagOnLine = null, 
         MarkdownTagType? externalTagType = null);
 }

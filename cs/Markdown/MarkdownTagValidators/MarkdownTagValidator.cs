@@ -4,12 +4,22 @@ namespace Markdown.MarkdownTagValidators;
 
 public class MarkdownTagValidator : IValidator
 {
-    public bool IsValidSingleTag(MarkdownTagType tagType, int positionOnLine, string line)
+    public bool IsValidTag(
+        MarkdownTagType tagType, 
+        int positionOnLine, 
+        string line, 
+        int? positionCloseTagOnLine = null,
+        MarkdownTagType? externalTagType = null)
     {
         throw new NotImplementedException();
     }
 
-    public bool IsValidPairedTag(
+    private bool IsValidSingleTag(MarkdownTagType tagType, int positionOnLine, string line)
+    {
+        throw new NotImplementedException();
+    }
+
+    private bool IsValidPairedTag(
         MarkdownTagType tagType, 
         int positionOpenTagOnLine, 
         int positionCloseTagOnLine, 
