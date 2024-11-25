@@ -10,5 +10,5 @@ public interface IParser
     /// </summary>
     /// <param name="markdownLineParagraph"> Абзац строки </param>
     /// <returns> Список тэгов </returns>
-    List<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph);
+    IEnumerable<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph);
 }

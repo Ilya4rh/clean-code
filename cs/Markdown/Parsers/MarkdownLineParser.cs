@@ -4,7 +4,7 @@ namespace Markdown.Parsers;
 
 public class MarkdownLineParser : IParser
 {
-    public List<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph)
+    public IEnumerable<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph)
     {
         throw new NotImplementedException();
     }
