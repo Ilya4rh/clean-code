@@ -3,7 +3,7 @@ using Markdown.MarkdownTags;
 using Markdown.MarkdownTagValidators;
 using NUnit.Framework;
 
-namespace MarkdownTests;
+namespace MarkdownTests.MarkdownTagValidatorTests;
 
 [TestFixture]
 public class MarkdownTagValidatorTests

@@ -28,7 +28,8 @@ public class MarkdownTagValidator : IValidator
             MarkdownTagType.Heading => IsValidHeadingTag(positionOnLine, line),
             MarkdownTagType.Italics when positionCloseTagOnLine != null 
                 => IsValidItalicsPairedTag(positionOnLine, positionCloseTagOnLine.Value, line),
-            MarkdownTagType.Bold => throw new NotImplementedException(),
+            MarkdownTagType.Bold when positionCloseTagOnLine != null => 
+                IsValidBoldTag(positionOnLine, positionCloseTagOnLine.Value, line, externalTagType),
             _ => throw new NotImplementedException()
         };
     }
@@ -65,9 +66,9 @@ public class MarkdownTagValidator : IValidator
             return false;
         if (positionOpenTagOnLine + 1 == positionCloseTagOnLine)
             return false;
-        if (IsTagsInDifferentWords(positionOpenTagOnLine, positionCloseTagOnLine, line))
+        if (IsTagsInDifferentWords(positionOpenTagOnLine, positionCloseTagOnLine, 2, line))
             return false;
-        if (IsTagsInsideTheTextWithNumbers(positionOpenTagOnLine, positionCloseTagOnLine, line))
+        if (IsTagsInsideTheTextWithNumbers(positionOpenTagOnLine, positionCloseTagOnLine, 1, line))
             return false;
         if (IsEscapedTag(positionOpenTagOnLine, positionCloseTagOnLine, line))
             return false;
@@ -75,13 +76,41 @@ public class MarkdownTagValidator : IValidator
         return true;
     }
 
-    private static bool IsTagsInDifferentWords(int positionOpenTagOnLine, int positionCloseTagOnLine, string line)
+    private static bool IsValidBoldTag(
+        int positionOpenTagOnLine,
+        int positionCloseTagOnLine,
+        string line,
+        MarkdownTagType? externalTagType)
     {
-        if (positionOpenTagOnLine == 0 && positionCloseTagOnLine == line.Length - 1)
+        if (line[positionOpenTagOnLine + 2] == ' ')
+            return false;
+        if (line[positionCloseTagOnLine - 1] == ' ')
+            return false;
+        if (positionOpenTagOnLine + 2 == positionCloseTagOnLine)
+            return false;
+        if (IsTagsInDifferentWords(positionOpenTagOnLine, positionCloseTagOnLine, 2, line))
+            return false;
+        if (IsTagsInsideTheTextWithNumbers(positionOpenTagOnLine, positionCloseTagOnLine, 2, line))
+            return false;
+        if (IsEscapedTag(positionOpenTagOnLine, positionCloseTagOnLine, line))
+            return false;
+        if (externalTagType is MarkdownTagType.Italics)
+            return false;
+        
+        return true;
+    }
+    
+    private static bool IsTagsInDifferentWords(
+        int positionOpenTagOnLine, 
+        int positionCloseTagOnLine, 
+        int tagLength, 
+        string line)
+    {
+        if (positionOpenTagOnLine == 0 && positionCloseTagOnLine + tagLength == line.Length)
             return false;
 
         if (positionOpenTagOnLine != 0 && line[positionOpenTagOnLine - 1] == ' ' &&
-            line[positionCloseTagOnLine + 1] == ' ' && positionCloseTagOnLine != line.Length - 1) return false;
+            line[positionCloseTagOnLine + tagLength] == ' ' && positionCloseTagOnLine != line.Length - 1) return false;
         
         var lineBetweenTags = 
             line.Substring(positionOpenTagOnLine, positionCloseTagOnLine - positionOpenTagOnLine);
@@ -91,16 +120,17 @@ public class MarkdownTagValidator : IValidator
 
     private static bool IsTagsInsideTheTextWithNumbers(
         int positionOpenTagOnLine, 
-        int positionCloseTagOnLine, 
+        int positionCloseTagOnLine,
+        int tagLength,
         string line)
     {
 
         if (positionOpenTagOnLine != 0 &&
-            IsTagOnNumber(line[positionOpenTagOnLine - 1], line[positionOpenTagOnLine + 1]))
+            IsTagOnNumber(line[positionOpenTagOnLine - 1], line[positionOpenTagOnLine + tagLength]))
             return true;
         
-        if (positionCloseTagOnLine != line.Length - 1 && 
-            IsTagOnNumber(line[positionCloseTagOnLine - 1], line[positionCloseTagOnLine + 1]))
+        if (positionCloseTagOnLine + tagLength != line.Length && 
+            IsTagOnNumber(line[positionCloseTagOnLine - 1], line[positionCloseTagOnLine + tagLength]))
             return true;
 
         return false;
