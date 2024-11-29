@@ -1,6 +1,6 @@
 ﻿namespace Markdown.MarkdownTags;
 
-public abstract class MarkdownTag
+public class MarkdownTag
 {
     // Тип markdown тэга
     public MarkdownTagType TagType;
@@ -8,11 +8,14 @@ public abstract class MarkdownTag
     public int Position;
     // Длина тэга
     public int Length;
+    // Если тэг закрывающий
+    public bool IsClosedTag;
     
-    public MarkdownTag(MarkdownTagType tagType, int position, int length)
+    public MarkdownTag(MarkdownTagType tagType, int position, int length, bool isClosedTag = false)
     {
         TagType = tagType;
         Position = position;
         Length = length;
+        IsClosedTag = isClosedTag;
     }
 }
