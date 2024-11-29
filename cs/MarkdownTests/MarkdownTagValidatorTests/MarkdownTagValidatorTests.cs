@@ -33,6 +33,22 @@ public class MarkdownTagValidatorTests
             .WithMessage("The 'positionOnLine' is less than zero or greater than the length of the string.");
     }
 
+    [Test]
+    public void IsValidTag_ThrowArgumentException_WhenPositionCloseTagIsNull()
+    {
+        var line = "_Hello, Markdown!_";
+
+        var action = () =>
+        {
+            _ = validator.IsValidTag(MarkdownTagType.Italics, 0, line);
+        };
+        
+        action
+            .Should()
+            .Throw<ArgumentException>()
+            .WithMessage("The 'positionCloseTagOnLine' value is null.");
+    }
+
     [TestCase(-1)]
     [TestCase(1000)]
     public void IsValidTag_ThrowArgumentException_WhenPositionCloseTagIsInvalid(int positionCloseTagOnLine)
