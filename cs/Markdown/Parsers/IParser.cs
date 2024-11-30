@@ -11,4 +11,11 @@ public interface IParser
     /// <param name="markdownLineParagraph"> Абзац строки </param>
     /// <returns> Список тэгов </returns>
     IEnumerable<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph);
+
+    /// <summary>
+    /// Метод, который парсит текст на абзацы
+    /// </summary>
+    /// <param name="markdownText"> Исходный текст </param>
+    /// <returns> Абзацы </returns>
+    IEnumerable<string> ParseMarkdownTextIntoParagraphs(string markdownText);
 }
