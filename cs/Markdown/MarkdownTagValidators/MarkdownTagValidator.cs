@@ -88,7 +88,8 @@ public class MarkdownTagValidator : IValidator
             return false;
 
         if (positionOpenTagOnLine != 0 && line[positionOpenTagOnLine - 1] == ' ' &&
-            line[positionCloseTagOnLine + tagLength] == ' ' && positionCloseTagOnLine != line.Length - 1) return false;
+            positionCloseTagOnLine != line.Length - 1 && line[positionCloseTagOnLine + tagLength] == ' ') 
+            return false;
         
         var lineBetweenTags = 
             line.Substring(positionOpenTagOnLine, positionCloseTagOnLine - positionOpenTagOnLine);
