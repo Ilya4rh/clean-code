@@ -3,13 +3,13 @@
 public class MarkdownTag
 {
     // Тип markdown тэга
-    public MarkdownTagType TagType;
+    public readonly MarkdownTagType TagType;
     // Позиция тэга в строке
-    public int Position;
+    public readonly int Position;
     // Длина тэга
-    public int Length;
+    public readonly int Length;
     // Если тэг закрывающий
-    public bool IsClosedTag;
+    public readonly bool IsClosedTag;
     
     public MarkdownTag(MarkdownTagType tagType, int position, int length, bool isClosedTag = false)
     {
