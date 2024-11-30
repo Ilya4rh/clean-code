@@ -4,7 +4,7 @@ namespace Markdown.Converters;
 
 public class HtmlConverter : IConverter
 {
-    public string Convert(MarkdownTag markdownTag, string markdownLine)
+    public string Convert(IEnumerable<MarkdownTag> tagsInLine, string markdownLine)
     {
         throw new NotImplementedException();
     }

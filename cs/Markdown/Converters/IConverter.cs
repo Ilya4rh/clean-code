@@ -4,5 +4,5 @@ namespace Markdown.Converters;
 
 public interface IConverter
 {
-    string Convert(MarkdownTag markdownTag, string markdownLine);
+    string Convert(IEnumerable<MarkdownTag> tagsInLine, string markdownLine);
 }
