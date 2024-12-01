@@ -11,25 +11,15 @@ public class MarkdownTagValidator : IValidator
         int? positionCloseTagOnLine = null,
         MarkdownTagType? externalTagType = null)
     {
-        if (positionOnLine < 0 || positionOnLine >= line.Length)
+        return tagType switch
         {
-            throw new ArgumentException(
-                "The 'positionOnLine' is less than zero or greater than the length of the string.");
-        }
-
-        if (tagType == MarkdownTagType.Heading)
-            return IsValidHeadingTag(positionOnLine, line);
-
-        if (positionCloseTagOnLine == null)
-            throw new ArgumentException("The 'positionCloseTagOnLine' value is null.");
-        
-        if (positionCloseTagOnLine < 0 || positionCloseTagOnLine >= line.Length)
-        {
-            throw new ArgumentException(
-                "The 'positionCloseTagOnLine' is less than zero or greater than the length of the string.");
-        }
-        
-        return IsValidPairedTag(tagType, positionOnLine, positionCloseTagOnLine.Value, line, externalTagType);
+            MarkdownTagType.Heading => IsValidHeadingTag(positionOnLine, line),
+            MarkdownTagType.Bold => 
+                IsValidBoldTag(positionOnLine, positionCloseTagOnLine!.Value, line, externalTagType),
+            MarkdownTagType.Italics => 
+                IsValidItalicsTag(positionOnLine, positionCloseTagOnLine!.Value, line),
+            _ => false
+        };
     }
 
     private static bool IsValidHeadingTag(int positionOnLine, string line)
@@ -53,29 +43,47 @@ public class MarkdownTagValidator : IValidator
         return positionOnLine + 1 >= line.Length || line[positionOnLine + 1] == ' ';
     }
 
-    private static bool IsValidPairedTag(
-        MarkdownTagType tagType, 
+    private static bool IsValidItalicsTag(
+        int positionOpenTagOnLine,
+        int positionCloseTagOnLine,
+        string line)
+    {
+        return IsValidPairedTag(positionOpenTagOnLine, positionCloseTagOnLine, line, 1);
+    }
+
+    private static bool IsValidBoldTag(
         int positionOpenTagOnLine,
         int positionCloseTagOnLine,
         string line,
         MarkdownTagType? externalTagType)
     {
-        var tagLength = tagType == MarkdownTagType.Bold ? 2 : 1;
-        
-        if (line[positionOpenTagOnLine + tagLength] == ' ' || line[positionCloseTagOnLine - 1] == ' ')
+        if (positionOpenTagOnLine + 2 == positionCloseTagOnLine)
             return false;
-        if (positionOpenTagOnLine + tagLength == positionCloseTagOnLine)
+        if (externalTagType is MarkdownTagType.Italics)
+            return false;
+
+        return IsValidPairedTag(positionOpenTagOnLine, positionCloseTagOnLine, line, 2);
+    }
+    
+    private static bool IsValidPairedTag( 
+        int positionOpenTagOnLine,
+        int positionCloseTagOnLine,
+        string line,
+        int tagLength)
+    {
+        if (IsTagNotHaveSpaces(positionOpenTagOnLine, positionCloseTagOnLine, line, tagLength))
             return false;
         if (IsTagsInDifferentWords(positionOpenTagOnLine, positionCloseTagOnLine, tagLength, line))
             return false;
         if (IsTagsInsideTheTextWithNumbers(positionOpenTagOnLine, positionCloseTagOnLine, tagLength, line))
             return false;
-        if (IsEscapedTag(positionOpenTagOnLine, positionCloseTagOnLine, line))
-            return false;
-        if (tagType is MarkdownTagType.Bold && externalTagType is MarkdownTagType.Italics)
-            return false;
+        
+        return !IsEscapedTag(positionOpenTagOnLine, positionCloseTagOnLine, line);
+    }
 
-        return true;
+    private static bool IsTagNotHaveSpaces(int positionOpenTag, int positionCloseTag, string line, int tagLength)
+    {
+        return line[positionOpenTag + tagLength] == ' ' || line[positionCloseTag-1] == ' ';
     }
 
     private static bool IsTagsInDifferentWords(
