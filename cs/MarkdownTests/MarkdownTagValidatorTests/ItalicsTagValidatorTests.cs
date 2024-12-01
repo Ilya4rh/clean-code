@@ -7,13 +7,13 @@ namespace MarkdownTests.MarkdownTagValidatorTests;
 
 public class ItalicsTagValidatorTests
 {
-    private IValidator validator;
+    private IMarkdownTagValidator markdownTagValidator;
     private readonly MarkdownTagType tagType = MarkdownTagType.Italics;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        validator = new MarkdownTagValidator();
+        markdownTagValidator = new MarkdownTagValidator();
     }
     
     [Test]
@@ -21,7 +21,7 @@ public class ItalicsTagValidatorTests
     {
         var line = "_ Hello!_";
 
-        var isValidTag = validator.IsValidTag(tagType, 0, line, 8);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 8);
 
         isValidTag.Should().BeFalse();
     }
@@ -31,7 +31,7 @@ public class ItalicsTagValidatorTests
     {
         var line = "_Hello! _";
        
-        var isValidTag = validator.IsValidTag(tagType, 0, line, 8);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 8);
 
         isValidTag.Should().BeFalse();
     }
@@ -41,7 +41,7 @@ public class ItalicsTagValidatorTests
     [TestCase(2, 14, "He_llo, world!_")]
     public void IsValidTag_ShouldBeFalse_WhenTagsInDifferentWords(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -53,7 +53,7 @@ public class ItalicsTagValidatorTests
         int positionCloseTag, 
         string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -62,7 +62,7 @@ public class ItalicsTagValidatorTests
     [TestCase(0, 7, @"_Hello\_")]
     public void IsValidTag_ShouldBeFalse_WhenIsEscapedTag(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -71,7 +71,7 @@ public class ItalicsTagValidatorTests
     [TestCase(0, 11, @"_Hello\\\\\_")]
     public void IsValidTag_ShouldBeFalse_WhenIsOddNumberOfEscapeChars(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -81,7 +81,7 @@ public class ItalicsTagValidatorTests
     {
         var line = "_Hello, world!_";
         
-        var isValidTag = validator.IsValidTag(tagType, 0, line, 14);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 14);
 
         isValidTag.Should().BeTrue();
     }
@@ -91,7 +91,7 @@ public class ItalicsTagValidatorTests
     [TestCase(2, 7, "He_llo,_ world!")]
     public void IsValidTag_ShouldBeTrue_WhenTagsInOneWord(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeTrue();
     }
@@ -103,7 +103,7 @@ public class ItalicsTagValidatorTests
         int positionCloseTag,
         string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeTrue();
     }

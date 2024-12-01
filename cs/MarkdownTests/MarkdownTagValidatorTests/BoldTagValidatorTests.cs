@@ -8,13 +8,13 @@ namespace MarkdownTests.MarkdownTagValidatorTests;
 [TestFixture]
 public class BoldTagValidatorTests
 {
-    private IValidator validator;
+    private IMarkdownTagValidator markdownTagValidator;
     private readonly MarkdownTagType tagType = MarkdownTagType.Bold;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        validator = new MarkdownTagValidator();
+        markdownTagValidator = new MarkdownTagValidator();
     }
     
     [Test]
@@ -22,7 +22,7 @@ public class BoldTagValidatorTests
     {
         var line = "__ Hello!__";
 
-        var isValidTag = validator.IsValidTag(tagType, 0, line, 9);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 9);
 
         isValidTag.Should().BeFalse();
     }
@@ -32,7 +32,7 @@ public class BoldTagValidatorTests
     {
         var line = "__Hello! __";
        
-        var isValidTag = validator.IsValidTag(tagType, 0, line, 9);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 9);
 
         isValidTag.Should().BeFalse();
     }
@@ -42,7 +42,7 @@ public class BoldTagValidatorTests
     {
         var line = "Hello, ____ world!";
         
-        var isValidTag = validator.IsValidTag(tagType, 7, line, 9);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 7, line, 9);
 
         isValidTag.Should().BeFalse();
     }
@@ -52,7 +52,7 @@ public class BoldTagValidatorTests
     [TestCase(2, 15, "He__llo, world!__")]
     public void IsValidTag_ShouldBeFalse_WhenTagsInDifferentWords(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -64,7 +64,7 @@ public class BoldTagValidatorTests
         int positionCloseTag, 
         string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -73,7 +73,7 @@ public class BoldTagValidatorTests
     [TestCase(0, 8, @"__Hello\__")]
     public void IsValidTag_ShouldBeFalse_WhenIsEscapedTag(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -82,7 +82,7 @@ public class BoldTagValidatorTests
     [TestCase(0, 12, @"__Hello\\\\\__")]
     public void IsValidTag_ShouldBeFalse_WhenIsOddNumberOfEscapeChars(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeFalse();
     }
@@ -92,7 +92,7 @@ public class BoldTagValidatorTests
     {
         var line = "_Hello, __big__ world_";
 
-        var isValidTag = validator.IsValidTag(tagType, 8, line, 13, MarkdownTagType.Italics);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 8, line, 13, MarkdownTagType.Italics);
 
         isValidTag.Should().BeFalse();
     }
@@ -102,7 +102,7 @@ public class BoldTagValidatorTests
     {
         var line = "__Hello, world!__";
         
-        var isValidTag = validator.IsValidTag(tagType, 0, line, 15);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 15);
 
         isValidTag.Should().BeTrue();
     }
@@ -112,7 +112,7 @@ public class BoldTagValidatorTests
     [TestCase(2, 8, "He__llo,__ world!")]
     public void IsValidTag_ShouldBeTrue_WhenTagsInOneWord(int positionOpenTag, int positionCloseTag, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeTrue();
     }
@@ -124,7 +124,7 @@ public class BoldTagValidatorTests
         int positionCloseTag,
         string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
 
         isValidTag.Should().BeTrue();
     }

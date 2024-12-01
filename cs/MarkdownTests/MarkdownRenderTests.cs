@@ -12,8 +12,8 @@ namespace MarkdownTests;
 public class MarkdownRenderTests
 {
     private Md md;
-    private readonly Mock<IParser> parserMock = new();
-    private readonly Mock<IConverter> converterMock = new();
+    private readonly Mock<IMarkdownLineParser> parserMock = new();
+    private readonly Mock<IHtmlConverter> converterMock = new();
 
     [OneTimeSetUp]
     public void OneTimeSetup()

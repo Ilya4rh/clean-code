@@ -2,7 +2,7 @@
 
 namespace Markdown.MarkdownTagValidators;
 
-public interface IValidator
+public interface IMarkdownTagValidator
 {
     /// <summary>
     /// Проверяет валидность тэга 

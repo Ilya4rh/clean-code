@@ -8,12 +8,12 @@ namespace MarkdownTests;
 [TestFixture]
 public class HtmlConverterTests
 {
-    private IConverter converter;
+    private IHtmlConverter htmlConverter;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        converter = new HtmlConverter();
+        htmlConverter = new HtmlConverter();
     }
     
     [Test]
@@ -21,7 +21,7 @@ public class HtmlConverterTests
     {
         var markdownLine = "Здесь нет тегов";
 
-        var htmlLine = converter.Convert([], markdownLine);
+        var htmlLine = htmlConverter.Convert([], markdownLine);
 
         htmlLine.Should().Be(markdownLine);
     }
@@ -35,7 +35,7 @@ public class HtmlConverterTests
             new(MarkdownTagType.Heading, 0, 1)
         };
 
-        var htmlLine = converter.Convert(tags, markdownLine);
+        var htmlLine = htmlConverter.Convert(tags, markdownLine);
 
         htmlLine.Should().Be(@"\<h1>Текст с заголовком\</h1>");
     }
@@ -50,7 +50,7 @@ public class HtmlConverterTests
             new(MarkdownTagType.Bold, 20, 2, true)
         };
 
-        var htmlLine = converter.Convert(tags, markdownLine);
+        var htmlLine = htmlConverter.Convert(tags, markdownLine);
 
         htmlLine.Should().Be(@"Текст с \<strong>полужирным\</strong> тегом");
     }
@@ -65,7 +65,7 @@ public class HtmlConverterTests
             new(MarkdownTagType.Italics, 17, 1, true)
         };
 
-        var htmlLine = converter.Convert(tags, markdownLine);
+        var htmlLine = htmlConverter.Convert(tags, markdownLine);
 
         htmlLine.Should().Be(@"Текст с \<em>курсивом\</em>");
     }
@@ -83,7 +83,7 @@ public class HtmlConverterTests
             new(MarkdownTagType.Bold, 12, 2, true)
         };
         
-        var htmlLine = converter.Convert(tags, markdownLine);
+        var htmlLine = htmlConverter.Convert(tags, markdownLine);
 
         htmlLine.Should().Be(@"\<h1>\<strong>\<em>Привет\</em>\</strong>\</h1>");
     }
@@ -100,7 +100,7 @@ public class HtmlConverterTests
             new(MarkdownTagType.Bold, 33, 2, true)
         };
         
-        var htmlLine = converter.Convert(tags, markdownLine);
+        var htmlLine = htmlConverter.Convert(tags, markdownLine);
 
         htmlLine.Should().Be(@"\<strong>Тут \<em>курсив\</em> внутри полужирного\</strong>");
     }

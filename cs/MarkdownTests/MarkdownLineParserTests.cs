@@ -9,12 +9,12 @@ namespace MarkdownTests;
 [TestFixture]
 public class MarkdownLineParserTests
 {
-    private IParser parser;
+    private IMarkdownLineParser markdownLineParser;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        parser = new MarkdownLineParser(new MarkdownTagValidator());
+        markdownLineParser = new MarkdownLineParser(new MarkdownTagValidator());
     }
     
     [Test]
@@ -23,7 +23,7 @@ public class MarkdownLineParserTests
         var paragraphLine = "# Hello, world!";
         var expectedTag = new MarkdownTag(MarkdownTagType.Heading, 0, 1);
 
-        var tags = parser.ParseMarkdownTags(paragraphLine);
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
         
         tags.First().Should().BeEquivalentTo(expectedTag);
     }
@@ -38,7 +38,7 @@ public class MarkdownLineParserTests
             new(MarkdownTagType.Italics, 14, 1, true),
         };
             
-        var tags = parser.ParseMarkdownTags(paragraphLine);
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
 
         tags.Should().BeEquivalentTo(expectedTags);
     }
@@ -53,7 +53,7 @@ public class MarkdownLineParserTests
             new(MarkdownTagType.Bold, 15, 2, true),
         };
             
-        var tags = parser.ParseMarkdownTags(paragraphLine);
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
 
         tags.Should().BeEquivalentTo(expectedTags);
     }
@@ -68,7 +68,7 @@ public class MarkdownLineParserTests
             new(MarkdownTagType.Italics, 33, 1, true),
         };
         
-        var tags = parser.ParseMarkdownTags(paragraphLine);
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
 
         tags.Should().BeEquivalentTo(expectedTags);
     }
@@ -79,7 +79,7 @@ public class MarkdownLineParserTests
         var paragraphLine =
             "В случае __пересечения _двойных__ и одинарных_ подчерков ни один из них не считается выделением.";
 
-        var tags = parser.ParseMarkdownTags(paragraphLine);
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
 
         tags.Should().BeEmpty();
     }
@@ -89,7 +89,7 @@ public class MarkdownLineParserTests
     {
         var paragraphLine = "__Hello, world!_";
 
-        var tags = parser.ParseMarkdownTags(paragraphLine);
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
 
         tags.Should().BeEmpty();
     }
@@ -99,7 +99,7 @@ public class MarkdownLineParserTests
     {
         var paragraphLine = "# Hello, __markdown _is_ difficult__, i am __very__ _tried!_";
 
-        var tags = parser.ParseMarkdownTags(paragraphLine).ToArray();
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine).ToArray();
 
         tags.Length.Should().Be(9);
     }
@@ -117,7 +117,7 @@ public class MarkdownLineParserTests
             new(MarkdownTagType.Bold, 11, 2, true)
         };
         
-        var tags = parser.ParseMarkdownTags(paragraphLine).ToArray();
+        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine).ToArray();
 
         tags.Should().BeEquivalentTo(expectedTags);
     }
@@ -127,7 +127,7 @@ public class MarkdownLineParserTests
     {
         var text = "_Первый абзац_ \n\n _Второй абзац_";
 
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(text);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
         
         paragraphs.Should().BeEquivalentTo("_Первый абзац_", "_Второй абзац_");
     }
@@ -137,7 +137,7 @@ public class MarkdownLineParserTests
     {
         var text = "_Первый абзац_ \n _Второй абзац_";
 
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(text);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
         
         paragraphs.Should().BeEquivalentTo("_Первый абзац_ _Второй абзац_");
     }
@@ -147,7 +147,7 @@ public class MarkdownLineParserTests
     {
         var text = "Первый абзац\n # Второй абзац \n Третий абзац";
         
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(text);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
         
         paragraphs.Should().BeEquivalentTo("Первый абзац", "# Второй абзац", "Третий абзац");
     }
@@ -157,7 +157,7 @@ public class MarkdownLineParserTests
     {
         var text = "Первый абзац\n     # Второй абзац \n\n Третий абзац";
         
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(text);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
         
         paragraphs.Should().BeEquivalentTo("Первый абзац # Второй абзац", "Третий абзац");
     }
@@ -167,7 +167,7 @@ public class MarkdownLineParserTests
     {
         var text = "_Первый абзац_  \n _Второй абзац_";
 
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(text);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
         
         paragraphs.Should().BeEquivalentTo("_Первый абзац_", "_Второй абзац_");
     }
@@ -177,7 +177,7 @@ public class MarkdownLineParserTests
     {
         var text = "Первый абзац \n\n\n\n Второй абзац";
         
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(text);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
         
         paragraphs.Should().BeEquivalentTo("Первый абзац", "Второй абзац");
     }

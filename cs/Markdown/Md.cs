@@ -5,24 +5,24 @@ namespace Markdown;
 
 public class Md
 {
-    private readonly IParser parser;
-    private readonly IConverter converter;
+    private readonly IMarkdownLineParser markdownLineParser;
+    private readonly IHtmlConverter htmlConverter;
 
-    public Md(IParser parser, IConverter converter)
+    public Md(IMarkdownLineParser markdownLineParser, IHtmlConverter htmlConverter)
     {
-        this.parser = parser;
-        this.converter = converter;
+        this.markdownLineParser = markdownLineParser;
+        this.htmlConverter = htmlConverter;
     }
 
     public string Render(string markdownLine)
     {
-        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(markdownLine);
+        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(markdownLine);
         var htmlParagraphs = new List<string>();
         
         foreach (var paragraph in paragraphs)
         {
-            var tagsInParagraph = parser.ParseMarkdownTags(paragraph);
-            var htmlLine = converter.Convert(tagsInParagraph, paragraph);
+            var tagsInParagraph = markdownLineParser.ParseMarkdownTags(paragraph);
+            var htmlLine = htmlConverter.Convert(tagsInParagraph, paragraph);
             htmlParagraphs.Add(htmlLine);
         }
 

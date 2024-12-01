@@ -2,7 +2,7 @@
 
 namespace Markdown.Converters;
 
-public interface IConverter
+public interface IHtmlConverter
 {
     string Convert(IEnumerable<MarkdownTag> tagsInLine, string markdownLine);
 }

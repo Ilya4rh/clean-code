@@ -2,7 +2,7 @@
 
 namespace Markdown.MarkdownTagValidators;
 
-public class MarkdownTagValidator : IValidator
+public class MarkdownTagValidator : IMarkdownTagValidator
 {
     public bool IsValidTag(
         MarkdownTagType tagType, 

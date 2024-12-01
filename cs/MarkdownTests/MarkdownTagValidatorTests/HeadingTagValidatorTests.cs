@@ -8,13 +8,13 @@ namespace MarkdownTests.MarkdownTagValidatorTests;
 [TestFixture]
 public class HeadingTagValidatorTests
 {
-    private IValidator validator;
+    private IMarkdownTagValidator markdownTagValidator;
     private readonly MarkdownTagType tagType = MarkdownTagType.Heading;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        validator = new MarkdownTagValidator();
+        markdownTagValidator = new MarkdownTagValidator();
     }
     
     [TestCase(4, "    # Heading")]
@@ -23,7 +23,7 @@ public class HeadingTagValidatorTests
         int tagPosition, 
         string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, tagPosition, line);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, tagPosition, line);
 
         isValidTag.Should().BeFalse();
     }
@@ -33,7 +33,7 @@ public class HeadingTagValidatorTests
     [TestCase(3, " H #")]
     public void IsValidTag_ShouldBeFalse_WhenHeadingTagHasTextInFront(int tagPosition, string line)
     {
-        var isValidTag = validator.IsValidTag(tagType, tagPosition, line);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, tagPosition, line);
         
         isValidTag.Should().BeFalse();
     }
@@ -43,7 +43,7 @@ public class HeadingTagValidatorTests
     {
         var line = "#Hello";
         
-        var isValidTag = validator.IsValidTag(tagType, 0, line);
+        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line);
         
         isValidTag.Should().BeFalse();
     }
@@ -52,7 +52,7 @@ public class HeadingTagValidatorTests
     [TestCase("# ")]
     public void IsValidTag_ShouldBeTrue_WhenHeadingTagHasPositionZeroAndSpace(string line)
     {
-        var isValid = validator.IsValidTag(tagType, 0, line);
+        var isValid = markdownTagValidator.IsValidTag(tagType, 0, line);
 
         isValid.Should().BeTrue();
     }
@@ -63,7 +63,7 @@ public class HeadingTagValidatorTests
         var line = "#";
         var positionOnLine = 0;
         
-        var isValid = validator.IsValidTag(tagType, positionOnLine, line);
+        var isValid = markdownTagValidator.IsValidTag(tagType, positionOnLine, line);
 
         isValid.Should().BeTrue();
     }
@@ -72,7 +72,7 @@ public class HeadingTagValidatorTests
     [TestCase(2, "  # ")]
     public void IsValidTag_ShouldBeTrue_WhenHeadingTagHasSpacesInFront(int tagPosition, string line)
     {
-        var isValid = validator.IsValidTag(tagType, tagPosition, line);
+        var isValid = markdownTagValidator.IsValidTag(tagType, tagPosition, line);
 
         isValid.Should().BeTrue();
     }

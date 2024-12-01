@@ -2,7 +2,7 @@
 
 namespace Markdown.Parsers;
 
-public interface IParser
+public interface IMarkdownLineParser
 {
     /// <summary>
     /// Метод, который парсит все тэги в строке.

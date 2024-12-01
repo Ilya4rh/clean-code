@@ -4,13 +4,13 @@ using Markdown.MarkdownTagValidators;
 
 namespace Markdown.Parsers;
 
-public class MarkdownLineParser : IParser
+public class MarkdownLineParser : IMarkdownLineParser
 {
-    private readonly IValidator validator;
+    private readonly IMarkdownTagValidator markdownTagValidator;
 
-    public MarkdownLineParser(IValidator validator)
+    public MarkdownLineParser(IMarkdownTagValidator markdownTagValidator)
     {
-        this.validator = validator;
+        this.markdownTagValidator = markdownTagValidator;
     }
 
     public IEnumerable<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph)
@@ -26,7 +26,7 @@ public class MarkdownLineParser : IParser
             var tagType = tagsPosition[i].TagType;
             var positionTag = tagsPosition[i].Position;
             
-            if (tagType == MarkdownTagType.Heading && validator.IsValidTag(tagType, positionTag, markdownLineParagraph))
+            if (tagType == MarkdownTagType.Heading && markdownTagValidator.IsValidTag(tagType, positionTag, markdownLineParagraph))
             {
                 parsedTags.Add(new MarkdownTag(tagType, positionTag, 1));
                 continue;
@@ -91,7 +91,7 @@ public class MarkdownLineParser : IParser
         var trimStartLine = line.TrimStart();
 
         return trimStartLine.Length > 0 && trimStartLine[0] == '#' &&
-               validator.IsValidTag(MarkdownTagType.Heading, line.Length - trimStartLine.Length, line);
+               markdownTagValidator.IsValidTag(MarkdownTagType.Heading, line.Length - trimStartLine.Length, line);
     }
     
     private (MarkdownTag openingTag, MarkdownTag closingTag)? SearchPairedTags(
@@ -118,7 +118,7 @@ public class MarkdownLineParser : IParser
             if (tagType == MarkdownTagType.Bold && IsHasExternalTag(positionOpenTag, closePosition, parsedItalicsTags))
                 externalTagType = MarkdownTagType.Italics;
                 
-            if (!validator.IsValidTag(tagType, positionOpenTag, markdownLineParagraph, closePosition, externalTagType)) 
+            if (!markdownTagValidator.IsValidTag(tagType, positionOpenTag, markdownLineParagraph, closePosition, externalTagType)) 
                 continue;
             
             positionsParsedTags.Add(closePosition);

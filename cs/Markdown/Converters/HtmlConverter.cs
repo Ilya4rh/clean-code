@@ -3,7 +3,7 @@ using Markdown.MarkdownTags;
 
 namespace Markdown.Converters;
 
-public class HtmlConverter : IConverter
+public class HtmlConverter : IHtmlConverter
 {
     public string Convert(IEnumerable<MarkdownTag> tagsInLine, string markdownLine)
     {
