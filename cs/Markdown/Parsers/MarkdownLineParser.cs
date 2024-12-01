@@ -16,7 +16,7 @@ public class MarkdownLineParser : IParser
     public IEnumerable<MarkdownTag> ParseMarkdownTags(string markdownLineParagraph)
     {
         var parsedTags = new List<MarkdownTag>();
-        var tagsPosition = SearchPositions(markdownLineParagraph).ToArray();
+        var tagsPosition = SearchTagPositionsAndTypes(markdownLineParagraph).ToArray();
         var positionsParsedTags = new HashSet<int>();
         var parsedBoldTags = new List<(MarkdownTag openTag, MarkdownTag closeTag)>();
         var parsedItalicsTags = new List<(MarkdownTag openTag, MarkdownTag closeTag)>();
@@ -52,7 +52,7 @@ public class MarkdownLineParser : IParser
         var disjointTags = GetDisjointTags(parsedItalicsTags, parsedBoldTags);
         parsedTags.AddRange(disjointTags);
         
-        return parsedTags;
+        return parsedTags.OrderBy(tag => tag.Position);
     }
 
     public IEnumerable<string> ParseMarkdownTextIntoParagraphs(string markdownText)
@@ -219,19 +219,68 @@ public class MarkdownLineParser : IParser
         };
     }
     
-    private static IEnumerable<(int Position, MarkdownTagType TagType)> SearchPositions(string markdownLineParagraph)
+    private static IEnumerable<(int Position, MarkdownTagType TagType)> SearchTagPositionsAndTypes(
+        string markdownLineParagraph)
     {
+        var tagPositionsAndTypes = new List<(int Position, MarkdownTagType TagType)>();
+        var isItalicsTagFollowBoldTag = false;
+        
         for (var i = 0; i < markdownLineParagraph.Length; i++)
         {
             if (markdownLineParagraph[i] != '#' && markdownLineParagraph[i] != '_')
                 continue;
 
             var tagType = DefineTagType(i, markdownLineParagraph);
+            tagPositionsAndTypes.Add((i, tagType));
             
-            yield return (i, tagType);
+            switch (tagType)
+            {
+                case MarkdownTagType.Italics when IsItalicsTagFollowBoldTag(tagPositionsAndTypes, i):
+                {
+                    if (isItalicsTagFollowBoldTag)
+                    {
+                        ChangeItalicsAndBoldTagsPositions(tagPositionsAndTypes);
+                        isItalicsTagFollowBoldTag = false;
+                    }
+                    else
+                        isItalicsTagFollowBoldTag = true;
 
-            if (tagType is MarkdownTagType.Bold) 
-                i++;
+                    break;
+                }
+                case MarkdownTagType.Bold:
+                    i++;
+                    break;
+            }
+        }
+
+        return tagPositionsAndTypes;
+    }
+
+    private static bool IsItalicsTagFollowBoldTag(
+        List<(int Position, MarkdownTagType TagType)> tagPositionsAndTypes,
+        int italicsTagPosition)
+    {
+        if (tagPositionsAndTypes.Count < 2)
+            return false;
+
+        return tagPositionsAndTypes[^2].TagType == MarkdownTagType.Bold &&
+               tagPositionsAndTypes[^2].Position == italicsTagPosition - 2;
+    }
+
+    private static void ChangeItalicsAndBoldTagsPositions(
+        List<(int Position, MarkdownTagType TagType)> tagPositionsAndTypes)
+    {
+        var italicsTagPosition = tagPositionsAndTypes[^1].Position;
+
+        for (var i = tagPositionsAndTypes.Count - 2; i >= 0; i++)
+        {
+            var currentTagPosition = tagPositionsAndTypes[i].Position;
+            
+            if (currentTagPosition != italicsTagPosition - 2 || tagPositionsAndTypes[i].TagType != MarkdownTagType.Bold)
+                break;
+
+            tagPositionsAndTypes[i] = (currentTagPosition, MarkdownTagType.Italics);
+            tagPositionsAndTypes[i + 1] = (currentTagPosition + 1, MarkdownTagType.Bold);
         }
     }
 }

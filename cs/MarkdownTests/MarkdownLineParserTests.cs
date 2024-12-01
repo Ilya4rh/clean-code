@@ -105,6 +105,24 @@ public class MarkdownLineParserTests
     }
 
     [Test]
+    public void ParseMarkdownTags_ParsedAllTags_WhenOneWordContainsAllTags()
+    {
+        var paragraphLine = "# ___Hello___";
+        var expectedTags = new List<MarkdownTag>
+        {
+            new(MarkdownTagType.Heading, 0, 1),
+            new(MarkdownTagType.Bold, 2, 2),
+            new(MarkdownTagType.Italics, 4, 1),
+            new(MarkdownTagType.Italics, 10, 1, true),
+            new(MarkdownTagType.Bold, 11, 2, true)
+        };
+        
+        var tags = parser.ParseMarkdownTags(paragraphLine).ToArray();
+
+        tags.Should().BeEquivalentTo(expectedTags);
+    }
+
+    [Test]
     public void ParseMarkdownTextIntoParagraphs_ReturnTwoParagraphs_WhenTextContainsTwoEmptyLines()
     {
         var text = "_Первый абзац_ \n\n _Второй абзац_";
