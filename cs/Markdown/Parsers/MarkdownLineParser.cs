@@ -23,18 +23,19 @@ public class MarkdownLineParser : IParser
 
         for (var i = 0; i < tagsPosition.Length; i++)
         {
-            var singleTag = SearchSingleTag(tagsPosition[i].TagType, tagsPosition[i].Position, markdownLineParagraph);
-
-            if (singleTag != null)
+            var tagType = tagsPosition[i].TagType;
+            var positionTag = tagsPosition[i].Position;
+            
+            if (tagType == MarkdownTagType.Heading && validator.IsValidTag(tagType, positionTag, markdownLineParagraph))
             {
-                parsedTags.Add(singleTag);
+                parsedTags.Add(new MarkdownTag(tagType, positionTag, 1));
                 continue;
             }
 
             var pairedTags = SearchPairedTags(
                 i + 1,
-                tagsPosition[i].TagType,
-                tagsPosition[i].Position,
+                tagType,
+                positionTag,
                 positionsParsedTags,
                 tagsPosition,
                 markdownLineParagraph,
@@ -43,7 +44,7 @@ public class MarkdownLineParser : IParser
             if (pairedTags == null) 
                 continue;
                 
-            if (tagsPosition[i].TagType == MarkdownTagType.Bold)
+            if (tagType == MarkdownTagType.Bold)
                 parsedBoldTags.Add(pairedTags.Value);
             else
                 parsedItalicsTags.Add(pairedTags.Value);
@@ -91,16 +92,6 @@ public class MarkdownLineParser : IParser
 
         return trimStartLine.Length > 0 && trimStartLine[0] == '#' &&
                validator.IsValidTag(MarkdownTagType.Heading, line.Length - trimStartLine.Length, line);
-    }
-
-    private MarkdownTag? SearchSingleTag(MarkdownTagType tagType, int positionTag, string markdownLineParagraph)
-    {
-        if (tagType == MarkdownTagType.Heading && validator.IsValidTag(tagType, positionTag, markdownLineParagraph))
-        {
-            return new MarkdownTag(tagType, positionTag, 1);
-        }
-
-        return null;
     }
     
     private (MarkdownTag openingTag, MarkdownTag closingTag)? SearchPairedTags(
