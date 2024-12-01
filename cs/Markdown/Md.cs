@@ -14,9 +14,18 @@ public class Md
         this.converter = converter;
     }
 
-    public string Render(string markDownString)
+    public string Render(string markdownLine)
     {
-        // TODO 
-        throw new NotImplementedException();
+        var paragraphs = parser.ParseMarkdownTextIntoParagraphs(markdownLine);
+        var htmlParagraphs = new List<string>();
+        
+        foreach (var paragraph in paragraphs)
+        {
+            var tagsInParagraph = parser.ParseMarkdownTags(paragraph);
+            var htmlLine = converter.Convert(tagsInParagraph, paragraph);
+            htmlParagraphs.Add(htmlLine);
+        }
+
+        return string.Join('\n', htmlParagraphs);
     }
 }
