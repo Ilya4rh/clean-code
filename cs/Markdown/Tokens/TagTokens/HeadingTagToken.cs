@@ -4,12 +4,21 @@ namespace Markdown.Tokens.TagTokens;
 
 public class HeadingTagToken : TagToken
 {
+    public HeadingTagToken(int positionInTokens)
+    {
+        PositionInTokens = positionInTokens;
+    }
+
+    private const string HeadingTag = "_";
+
     public override MarkdownTagType TagType => MarkdownTagType.Heading;
 
-    public override string Content => "#";
+    public override string Content => HeadingTag;
+    
+    public override int PositionInTokens { get; }
 
-    public override bool IsTagToken(string line, int position)
+    public static bool IsHeadingTagToken(string line, int position)
     {
-        return line[position].ToString() == Content;
+        return line[position].ToString() == HeadingTag;
     }
 }
