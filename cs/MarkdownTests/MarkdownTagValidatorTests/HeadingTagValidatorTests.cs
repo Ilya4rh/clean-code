@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using Markdown.MarkdownTags;
 using Markdown.MarkdownTagValidators;
+using Markdown.Tokens;
+using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
 namespace MarkdownTests.MarkdownTagValidatorTests;
@@ -8,32 +11,15 @@ namespace MarkdownTests.MarkdownTagValidatorTests;
 [TestFixture]
 public class HeadingTagValidatorTests
 {
-    private IMarkdownTagValidator markdownTagValidator;
-    private readonly MarkdownTagType tagType = MarkdownTagType.Heading;
+    private readonly MarkdownTagValidator markdownTagValidator = new();
+    private const MarkdownTagType TagType = MarkdownTagType.Heading;
 
-    [OneTimeSetUp]
-    public void OneTimeSetup()
+    [Test]
+    public void IsValidTag_ShouldBeFalse_WhenHeadingTagTokenPositionIsNotZero()
     {
-        markdownTagValidator = new MarkdownTagValidator();
-    }
-    
-    [TestCase(4, "    # Heading")]
-    [TestCase(10, "          # Heading")]
-    public void IsValidTag_ShouldBeFalse_WhenHeadingTagHasSpacesInFrontAndPositionGreaterOrEqualToFour(
-        int tagPosition, 
-        string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, tagPosition, line);
-
-        isValidTag.Should().BeFalse();
-    }
-    
-    [TestCase(1, "1#Hello")]
-    [TestCase(2, @"\\#")]
-    [TestCase(3, " H #")]
-    public void IsValidTag_ShouldBeFalse_WhenHeadingTagHasTextInFront(int tagPosition, string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, tagPosition, line);
+        var paragraphOfTokens = new List<IToken> { new TextToken("A"), new HeadingTagToken(1)  };
+        
+        var isValidTag = markdownTagValidator.IsValidTag(paragraphOfTokens, new HeadingTagToken(1));
         
         isValidTag.Should().BeFalse();
     }
@@ -41,38 +27,22 @@ public class HeadingTagValidatorTests
     [Test]
     public void IsValidTag_ShouldBeFalse_WhenNoSpaceAfterHeadingTag()
     {
-        var line = "#Hello";
+        var paragraphOfTokens = new List<IToken> { new HeadingTagToken(0), new TextToken("A") };
         
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line);
+        var isValidTag = markdownTagValidator.IsValidTag(paragraphOfTokens, new HeadingTagToken(0));
         
         isValidTag.Should().BeFalse();
     }
     
-    [TestCase("# Привет, мир!")]
-    [TestCase("# ")]
-    public void IsValidTag_ShouldBeTrue_WhenHeadingTagHasPositionZeroAndSpace(string line)
-    {
-        var isValid = markdownTagValidator.IsValidTag(tagType, 0, line);
-
-        isValid.Should().BeTrue();
-    }
-
     [Test]
-    public void IsValidTag_ShouldBeTrue_WhenHeadingTagIsOnePerLine()
+    public void IsValidTag_ShouldBeTrue_WhenHeadingTagHasPositionZeroAndSpace()
     {
-        var line = "#";
-        var positionOnLine = 0;
+        var paragraphOfTokens = new List<IToken>
+        {
+            new HeadingTagToken(0), new SpaceToken(), new TextToken("A")
+        };
         
-        var isValid = markdownTagValidator.IsValidTag(tagType, positionOnLine, line);
-
-        isValid.Should().BeTrue();
-    }
-    
-    [TestCase(1, " # Hello")]
-    [TestCase(2, "  # ")]
-    public void IsValidTag_ShouldBeTrue_WhenHeadingTagHasSpacesInFront(int tagPosition, string line)
-    {
-        var isValid = markdownTagValidator.IsValidTag(tagType, tagPosition, line);
+        var isValid = markdownTagValidator.IsValidTag(paragraphOfTokens, new HeadingTagToken(0));
 
         isValid.Should().BeTrue();
     }
