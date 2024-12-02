@@ -15,8 +15,8 @@ public class MarkdownTagValidator : IMarkdownTagValidator
         return openingTagToken.MarkdownTagType switch
         {
             MarkdownTagType.Heading => IsValidHeadingTag(openingTagToken, paragraphOfTokens),
-            MarkdownTagType.Italics => false,
-            MarkdownTagType.Bold => false,
+            MarkdownTagType.Italics => IsValidItalicsTag(paragraphOfTokens, openingTagToken, closingTagToken!),
+            MarkdownTagType.Bold => IsValidBoldTag(paragraphOfTokens, openingTagToken, closingTagToken!, externalTagType),
             _ => false
         };
     }
@@ -31,150 +31,124 @@ public class MarkdownTagValidator : IMarkdownTagValidator
 
         return position == 0 && paragraphOfTokens[position + 1].Type == TokenType.Space;
     }
-    
-    private static bool IsValidHeadingTag(int positionOnLine, string line)
-    {
-        switch (positionOnLine)
-        {
-            case >= 4:
-                return false;
-            case > 0:
-            {
-                for (var i = 0; i < positionOnLine; i++)
-                {
-                    if (line[i] != ' ')
-                        return false;
-                }
-
-                break;
-            }
-        }
-
-        return positionOnLine + 1 >= line.Length || line[positionOnLine + 1] == ' ';
-    }
 
     private static bool IsValidItalicsTag(
-        int positionOpenTagOnLine,
-        int positionCloseTagOnLine,
-        string line)
+        List<IToken> paragraphOfTokens, 
+        TagToken openingTagToken, 
+        TagToken closingTagToken)
     {
-        return IsValidPairedTag(positionOpenTagOnLine, positionCloseTagOnLine, line, 1);
+        return IsValidPairedTag(paragraphOfTokens, openingTagToken, closingTagToken);
     }
 
     private static bool IsValidBoldTag(
-        int positionOpenTagOnLine,
-        int positionCloseTagOnLine,
-        string line,
+        List<IToken> paragraphOfTokens, 
+        TagToken openingTagToken, 
+        TagToken closingTagToken,
         MarkdownTagType? externalTagType)
     {
-        if (positionOpenTagOnLine + 2 == positionCloseTagOnLine)
+        if (openingTagToken.PositionInTokens + openingTagToken.Content.Length == closingTagToken.PositionInTokens)
             return false;
         if (externalTagType is MarkdownTagType.Italics)
             return false;
 
-        return IsValidPairedTag(positionOpenTagOnLine, positionCloseTagOnLine, line, 2);
+        return IsValidPairedTag(paragraphOfTokens, openingTagToken, closingTagToken);
     }
     
     private static bool IsValidPairedTag( 
-        int positionOpenTagOnLine,
-        int positionCloseTagOnLine,
-        string line,
-        int tagLength)
+        List<IToken> paragraphOfTokens, 
+        TagToken openingTagToken, 
+        TagToken closingTagToken)
     {
-        if (IsTagNotHaveSpaces(positionOpenTagOnLine, positionCloseTagOnLine, line, tagLength))
+        var positionOpening = openingTagToken.PositionInTokens;
+        var positionClosing = openingTagToken.PositionInTokens;
+        
+        // Подумать о выносе этих метод из класса
+        if (IsSpaceAfterTagToken(paragraphOfTokens, positionOpening) || 
+            IsSpaceBeforeTagToken(paragraphOfTokens, positionClosing))
             return false;
-        if (IsTagsInDifferentWords(positionOpenTagOnLine, positionCloseTagOnLine, tagLength, line))
+        if (IsTagsInDifferentWords(paragraphOfTokens, positionOpening, positionClosing))
             return false;
-        if (IsTagsInsideTheTextWithNumbers(positionOpenTagOnLine, positionCloseTagOnLine, tagLength, line))
+        if (IsTagsInsideTheTextWithNumbers(paragraphOfTokens, positionOpening, positionClosing))
+            return false;
+        if (IsScreenedTag(paragraphOfTokens, openingTagToken.PositionInTokens) ||
+            IsScreenedTag(paragraphOfTokens, closingTagToken.PositionInTokens))
             return false;
         
-        return !IsEscapedTag(positionOpenTagOnLine, positionCloseTagOnLine, line);
+        return true;
     }
 
-    private static bool IsTagNotHaveSpaces(int positionOpenTag, int positionCloseTag, string line, int tagLength)
+    private static bool IsSpaceAfterTagToken(List<IToken> paragraphOfTokens, int tagTokenPosition)
     {
-        return line[positionOpenTag + tagLength] == ' ' || line[positionCloseTag-1] == ' ';
+        if (tagTokenPosition == paragraphOfTokens.Count - 1)
+            return false;
+        
+        var nextToken = paragraphOfTokens[tagTokenPosition + 1];
+
+        return nextToken.Type == TokenType.Space;
+    }
+    
+    private static bool IsSpaceBeforeTagToken(List<IToken> paragraphOfTokens, int tagTokenPosition)
+    {
+        if (tagTokenPosition == 0)
+            return false;
+        
+        var previousToken = paragraphOfTokens[tagTokenPosition - 1];
+
+        return previousToken.Type == TokenType.Space;
     }
 
     private static bool IsTagsInDifferentWords(
-        int positionOpenTagOnLine, 
-        int positionCloseTagOnLine, 
-        int tagLength, 
-        string line)
+        List<IToken> paragraphOfTokens, 
+        int positionOpeningTagToken, 
+        int positionClosingTagToken)
     {
-        if (positionOpenTagOnLine == 0 && positionCloseTagOnLine + tagLength == line.Length)
+        if (positionOpeningTagToken == 0 && 
+            positionClosingTagToken == paragraphOfTokens.Count - 1)
             return false;
 
-        if (positionOpenTagOnLine != 0 && line[positionOpenTagOnLine - 1] == ' ' &&
-            positionCloseTagOnLine != line.Length - tagLength && line[positionCloseTagOnLine + tagLength] == ' ') 
+        if (IsSpaceBeforeTagToken(paragraphOfTokens, positionOpeningTagToken) &&
+            IsSpaceAfterTagToken(paragraphOfTokens, positionClosingTagToken)) 
             return false;
+
+        var numberOfTokensBetweenTags = positionClosingTagToken - positionOpeningTagToken;
+
+        var tokensBetweenTags = paragraphOfTokens.GetRange(positionOpeningTagToken, numberOfTokensBetweenTags);
         
-        var lineBetweenTags = 
-            line.Substring(positionOpenTagOnLine, positionCloseTagOnLine - positionOpenTagOnLine);
-        
-        return lineBetweenTags.Contains(' ');
+        return tokensBetweenTags.Any(token => token.Type == TokenType.Space);
     }
 
     private static bool IsTagsInsideTheTextWithNumbers(
-        int positionOpenTagOnLine, 
-        int positionCloseTagOnLine,
-        int tagLength,
-        string line)
+        List<IToken> paragraphOfTokens, 
+        int positionOpeningTagToken, 
+        int positionClosingTagToken)
     {
 
-        if (positionOpenTagOnLine != 0 &&
-            IsTagOnNumber(line[positionOpenTagOnLine - 1], line[positionOpenTagOnLine + tagLength]))
+        if (positionOpeningTagToken != 0 && IsTagOnNumber(paragraphOfTokens, positionOpeningTagToken))
             return true;
         
-        if (positionCloseTagOnLine + tagLength != line.Length && 
-            IsTagOnNumber(line[positionCloseTagOnLine - 1], line[positionCloseTagOnLine + tagLength]))
+        if (positionClosingTagToken != paragraphOfTokens.Count - 1 && 
+            IsTagOnNumber(paragraphOfTokens, positionClosingTagToken))
             return true;
 
         return false;
     }
 
-    private static bool IsTagOnNumber(char symbolToLeftOfTag, char symbolToRightOfTag)
+    private static bool IsTagOnNumber(List<IToken> paragraphOfTokens, int tagTokenPosition)
     {
-        var numbers = new HashSet<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-
-        return numbers.Contains(symbolToLeftOfTag) && numbers.Contains(symbolToRightOfTag);
+        return paragraphOfTokens[tagTokenPosition - 1].Type == TokenType.Digit && 
+               paragraphOfTokens[tagTokenPosition - 1].Type == TokenType.Digit;
     }
 
-    private static bool IsEscapedTag(int positionOpenTagOnLine, int positionCloseTagOnLine, string line)
+    private static bool IsScreenedTag(List<IToken> paragraphOfTokens, int tagPosition)
     {
-        int numberOfEscape;
+        if (tagPosition == 0)
+            return false;
+
+        var previousToken = paragraphOfTokens[tagPosition - 1];
         
-        if (positionOpenTagOnLine > 0 && line[positionOpenTagOnLine - 1] == '\\')
-        {
-            numberOfEscape = CalculateNumberOfEscapeChar(positionOpenTagOnLine - 1, line);
-            
-            if (numberOfEscape % 2 != 0)
-                return true;
-        }
+        if (tagPosition == 1 && previousToken.Type == TokenType.Screening)
+            return true;
 
-        if (line[positionCloseTagOnLine - 1] != '\\') 
-             return false;
-        
-        numberOfEscape = CalculateNumberOfEscapeChar(positionCloseTagOnLine - 1, line);
-        
-        return numberOfEscape % 2 != 0;
-    }
-
-    private static int CalculateNumberOfEscapeChar(int positionFirstEscapeChar, string line)
-    {
-        var numberOfEscape = 1;
-
-        if (positionFirstEscapeChar == 0)
-            return numberOfEscape;
-
-        for (var i = positionFirstEscapeChar - 1; i >= 0; i--)
-        {
-            if (line[i] != '\\')
-                break;
-
-            numberOfEscape++;
-        }
-
-        return numberOfEscape;
+        return paragraphOfTokens[tagPosition - 2].Type != TokenType.Screening;
     }
 }
