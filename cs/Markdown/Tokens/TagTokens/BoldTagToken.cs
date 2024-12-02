@@ -11,7 +11,7 @@ public class BoldTagToken : TagToken
 
     private const string BoldTag = "_";
     
-    public override MarkdownTagType TagType => MarkdownTagType.Bold;
+    public override MarkdownTagType MarkdownTagType => MarkdownTagType.Bold;
 
     public override string Content => BoldTag;
     

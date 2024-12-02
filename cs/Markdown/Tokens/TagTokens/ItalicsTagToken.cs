@@ -11,7 +11,7 @@ public class ItalicsTagToken : TagToken
 
     private const string ItalicsTag = "_";
 
-    public override MarkdownTagType TagType => MarkdownTagType.Italics;
+    public override MarkdownTagType MarkdownTagType => MarkdownTagType.Italics;
 
     public override string Content => ItalicsTag;
     

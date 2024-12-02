@@ -5,7 +5,7 @@ public abstract class CommonToken : IToken
     public abstract TokenType Type { get; }
     public abstract string Content { get; }
 
-    public static CommonToken GetCommonToken(char symbol)
+    public static CommonToken CreateCommonToken(char symbol)
     {
         if (char.IsDigit(symbol))
             return new DigitToken(symbol.ToString());

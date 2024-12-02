@@ -11,7 +11,7 @@ public class HeadingTagToken : TagToken
 
     private const string HeadingTag = "_";
 
-    public override MarkdownTagType TagType => MarkdownTagType.Heading;
+    public override MarkdownTagType MarkdownTagType => MarkdownTagType.Heading;
 
     public override string Content => HeadingTag;
     
