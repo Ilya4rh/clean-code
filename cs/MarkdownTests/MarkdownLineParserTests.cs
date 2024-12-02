@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
-using Markdown.MarkdownTags;
-using Markdown.MarkdownTagValidators;
-using Markdown.Parsers;
+using Markdown.Parsers.MarkdownLineParsers;
+using Markdown.Tokens;
+using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
 namespace MarkdownTests;
@@ -9,176 +10,82 @@ namespace MarkdownTests;
 [TestFixture]
 public class MarkdownLineParserTests
 {
-    private IMarkdownLineParser markdownLineParser;
+    private readonly MarkdownLineParser markdownLineParser = new MarkdownLineParser();
 
-    [OneTimeSetUp]
-    public void OneTimeSetup()
-    {
-        markdownLineParser = new MarkdownLineParser(new MarkdownTagValidator());
-    }
-    
     [Test]
-    public void ParseMarkdownTags_ReturnHeadingTagType_WhenParagraphBeginsWithHeadingTag()
+    public void ParseParagraphForTokens_ShouldDefineHeadingTagToken()
     {
-        var paragraphLine = "# Hello, world!";
-        var expectedTag = new MarkdownTag(MarkdownTagType.Heading, 0, 1);
-
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
+        const string paragraph = "#";
         
-        tags.First().Should().BeEquivalentTo(expectedTag);
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
+
+        paragraphOfTokens.Should().BeEquivalentTo([new HeadingTagToken(0)]);
     }
     
     [Test]
-    public void ParseMarkdownTags_ReturnItalicsTagsType_WhenParagraphContainsItalicsTagOnly()
+    public void ParseParagraphForTokens_ShouldDefineBoldTagToken()
     {
-        var paragraphLine = "_Hello, world!_";
-        var expectedTags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Italics, 0, 1),
-            new(MarkdownTagType.Italics, 14, 1, true),
-        };
-            
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
-
-        tags.Should().BeEquivalentTo(expectedTags);
-    }
-    
-    [Test]
-    public void ParseMarkdownTags_ReturnBoldTagsType_WhenParagraphContainsBoldTagOnly()
-    {
-        var paragraphLine = "__Hello, world!__";
-        var expectedTags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Bold, 0, 2),
-            new(MarkdownTagType.Bold, 15, 2, true),
-        };
-            
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
-
-        tags.Should().BeEquivalentTo(expectedTags);
-    }
-
-    [Test]
-    public void ParseMarkdownTags_ReturnItalicsTagsOnly_WhenInsideBoldTags()
-    {
-        var paragraphLine = "Внутри _одинарного __двойное__ не_ работает.";
-        var expectedTags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Italics, 7, 1),
-            new(MarkdownTagType.Italics, 33, 1, true),
-        };
+        const string paragraph = "__";
         
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
 
-        tags.Should().BeEquivalentTo(expectedTags);
+        paragraphOfTokens.Should().BeEquivalentTo([new BoldTagToken(0)]);
     }
     
     [Test]
-    public void ParseMarkdownTags_ShouldBeEmpty_WhenTagsOverlap()
+    public void ParseParagraphForTokens_ShouldDefineItalicsTagToken()
     {
-        var paragraphLine =
-            "В случае __пересечения _двойных__ и одинарных_ подчерков ни один из них не считается выделением.";
+        const string paragraph = "_";
+        
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
 
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
-
-        tags.Should().BeEmpty();
+        paragraphOfTokens.Should().BeEquivalentTo([new ItalicsTagToken(0)]);
     }
-
+    
     [Test]
-    public void ParseMarkdownTags_ShouldBeEmpty_WhenTagsDoNotHavePair()
+    public void ParseParagraphForTokens_ShouldDefineDigitToken()
     {
-        var paragraphLine = "__Hello, world!_";
+        const string paragraph = "1";
+        
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
 
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine);
-
-        tags.Should().BeEmpty();
+        paragraphOfTokens.Should().BeEquivalentTo([new DigitToken("1")]);
     }
-
+    
     [Test]
-    public void ParseMarkdownTags_ParsedAllTags_WhenAllTagsIsValid()
+    public void ParseParagraphForTokens_ShouldDefineSpaceToken()
     {
-        var paragraphLine = "# Hello, __markdown _is_ difficult__, i am __very__ _tried!_";
+        const string paragraph = " ";
+        
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
 
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine).ToArray();
-
-        tags.Length.Should().Be(9);
+        paragraphOfTokens.Should().BeEquivalentTo([new SpaceToken()]);
     }
-
+    
     [Test]
-    public void ParseMarkdownTags_ParsedAllTags_WhenOneWordContainsAllTags()
+    public void ParseParagraphForTokens_ShouldDefineScreeningToken()
     {
-        var paragraphLine = "# ___Hello___";
-        var expectedTags = new List<MarkdownTag>
+        const string paragraph = "\\";
+        
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
+
+        paragraphOfTokens.Should().BeEquivalentTo([new ScreeningToken()]);
+    }
+    
+    [Test]
+    public void ParseParagraphForTokens_ShouldDefineTextToken()
+    {
+        const string paragraph = "Abc!";
+        var expectedTokens = new List<IToken>
         {
-            new(MarkdownTagType.Heading, 0, 1),
-            new(MarkdownTagType.Bold, 2, 2),
-            new(MarkdownTagType.Italics, 4, 1),
-            new(MarkdownTagType.Italics, 10, 1, true),
-            new(MarkdownTagType.Bold, 11, 2, true)
+            new TextToken("A"), 
+            new TextToken("b"), 
+            new TextToken("c"), 
+            new TextToken("!")
         };
         
-        var tags = markdownLineParser.ParseMarkdownTags(paragraphLine).ToArray();
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
 
-        tags.Should().BeEquivalentTo(expectedTags);
-    }
-
-    [Test]
-    public void ParseMarkdownTextIntoParagraphs_ReturnTwoParagraphs_WhenTextContainsTwoEmptyLines()
-    {
-        var text = "_Первый абзац_ \n\n _Второй абзац_";
-
-        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
-        
-        paragraphs.Should().BeEquivalentTo("_Первый абзац_", "_Второй абзац_");
-    }
-    
-    [Test]
-    public void ParseMarkdownTextIntoParagraphs_ReturnMultiLineParagraph_WhenTextContainsEmptyLines()
-    {
-        var text = "_Первый абзац_ \n _Второй абзац_";
-
-        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
-        
-        paragraphs.Should().BeEquivalentTo("_Первый абзац_ _Второй абзац_");
-    }
-
-    [Test]
-    public void ParseMarkdownTextIntoParagraphs_ReturnThreeParagraphs_WhenHeadingTagInText()
-    {
-        var text = "Первый абзац\n # Второй абзац \n Третий абзац";
-        
-        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
-        
-        paragraphs.Should().BeEquivalentTo("Первый абзац", "# Второй абзац", "Третий абзац");
-    }
-    
-    [Test]
-    public void ParseMarkdownTextIntoParagraphs_ReturnTwoParagraphs_WhenInvalidHeadingTagInText()
-    {
-        var text = "Первый абзац\n     # Второй абзац \n\n Третий абзац";
-        
-        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
-        
-        paragraphs.Should().BeEquivalentTo("Первый абзац # Второй абзац", "Третий абзац");
-    }
-
-    [Test]
-    public void ParseMarkdownTextIntoParagraphs_ReturnTwoParagraphs_WhenLineContainsTwoSpaces()
-    {
-        var text = "_Первый абзац_  \n _Второй абзац_";
-
-        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
-        
-        paragraphs.Should().BeEquivalentTo("_Первый абзац_", "_Второй абзац_");
-    }
-
-    [Test]
-    public void ParseMarkdownTextIntoParagraphs_SkipEmptyLines_WhenTextContainsFourEmptyLines()
-    {
-        var text = "Первый абзац \n\n\n\n Второй абзац";
-        
-        var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(text);
-        
-        paragraphs.Should().BeEquivalentTo("Первый абзац", "Второй абзац");
+        paragraphOfTokens.Should().BeEquivalentTo(expectedTokens);
     }
 }
