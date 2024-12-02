@@ -19,7 +19,7 @@ public class BoldTagToken : TagToken
 
     public static bool IsBoldTagToken(string line, int position)
     {
-        if (line.Length < BoldTag.Length)
+        if (line.Length - position < BoldTag.Length)
             return false;
 
         return line.Substring(position, BoldTag.Length) == BoldTag;
