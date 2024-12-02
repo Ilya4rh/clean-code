@@ -1,21 +1,27 @@
-﻿namespace Markdown.MarkdownTags;
+﻿using Markdown.Tokens.TagTokens;
 
-public class MarkdownTag
+namespace Markdown.MarkdownTags;
+
+public abstract class MarkdownTag
 {
-    // Тип markdown тэга
-    public readonly MarkdownTagType TagType;
-    // Позиция тэга в строке
-    public readonly int Position;
-    // Длина тэга
-    public readonly int Length;
+    // // Тип markdown тэга
+    // public abstract MarkdownTagType TagType { get; }
+    // // Позиция тэга в строке
+    // public abstract int Position { get; }
+    // // Длина тэга
+    // public abstract int Length { get; }
+    public abstract TagToken TagToken { get; }
     // Если тэг закрывающий
-    public readonly bool IsClosedTag;
-    
-    public MarkdownTag(MarkdownTagType tagType, int position, int length, bool isClosedTag = false)
+    public abstract bool IsClosedTag { get; }
+
+    public static MarkdownTag? CreateMarkdownTag(TagToken tagToken, bool isClosedTag = false)
     {
-        TagType = tagType;
-        Position = position;
-        Length = length;
-        IsClosedTag = isClosedTag;
+        return tagToken.MarkdownTagType switch
+        {
+            MarkdownTagType.Italics => new MarkdownItalicsTag(tagToken, isClosedTag),
+            MarkdownTagType.Bold => new MarkdownBoldTag(tagToken, isClosedTag),
+            MarkdownTagType.Heading => new MarkdownHeadingTag(tagToken),
+            _ => null
+        };
     }
 }
