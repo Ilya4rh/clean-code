@@ -1,4 +1,6 @@
 ﻿using Markdown.MarkdownTags;
+using Markdown.Tokens;
+using Markdown.Tokens.TagTokens;
 
 namespace Markdown.MarkdownTagValidators;
 
@@ -7,16 +9,14 @@ public interface IMarkdownTagValidator
     /// <summary>
     /// Проверяет валидность тэга 
     /// </summary>
-    /// <param name="tagType"> Тип тэга, который проверяется</param>
-    /// <param name="positionOnLine"> Позиция тэга в строке </param>
-    /// <param name="line"> Строка, в которой находится тэг </param>
-    /// <param name="positionCloseTagOnLine"> Позиция закрывающего тэга, если он парный </param>
+    /// <param name="paragraphOfTokens"></param>
+    /// <param name="openingTagToken"></param>
+    /// <param name="closingTagToken"></param>
     /// <param name="externalTagType"> Тип внешнего тэга, для текущего </param>
     /// <returns></returns>
-    bool IsValidTag(
-        MarkdownTagType tagType, 
-        int positionOnLine, 
-        string line,
-        int? positionCloseTagOnLine = null, 
+    public bool IsValidTag(
+        List<IToken> paragraphOfTokens,
+        TagToken openingTagToken,
+        TagToken? closingTagToken = null,
         MarkdownTagType? externalTagType = null);
 }
