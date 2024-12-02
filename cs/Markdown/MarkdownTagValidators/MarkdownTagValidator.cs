@@ -1,27 +1,37 @@
 ﻿using Markdown.MarkdownTags;
+using Markdown.Tokens;
+using Markdown.Tokens.TagTokens;
 
 namespace Markdown.MarkdownTagValidators;
 
 public class MarkdownTagValidator : IMarkdownTagValidator
 {
     public bool IsValidTag(
-        MarkdownTagType tagType, 
-        int positionOnLine, 
-        string line, 
-        int? positionCloseTagOnLine = null,
+        List<IToken> paragraphOfTokens, 
+        TagToken openingTagToken, 
+        TagToken? closingTagToken = null,
         MarkdownTagType? externalTagType = null)
     {
-        return tagType switch
+        return openingTagToken.MarkdownTagType switch
         {
-            MarkdownTagType.Heading => IsValidHeadingTag(positionOnLine, line),
-            MarkdownTagType.Bold => 
-                IsValidBoldTag(positionOnLine, positionCloseTagOnLine!.Value, line, externalTagType),
-            MarkdownTagType.Italics => 
-                IsValidItalicsTag(positionOnLine, positionCloseTagOnLine!.Value, line),
+            MarkdownTagType.Heading => IsValidHeadingTag(openingTagToken, paragraphOfTokens),
+            MarkdownTagType.Italics => false,
+            MarkdownTagType.Bold => false,
             _ => false
         };
     }
+    
+    
+    private static bool IsValidHeadingTag(TagToken tagToken, List<IToken> paragraphOfTokens)
+    {
+        var position = tagToken.PositionInTokens;
 
+        if (paragraphOfTokens.Count < 2)
+            return false;
+
+        return position == 0 && paragraphOfTokens[position + 1].Type == TokenType.Space;
+    }
+    
     private static bool IsValidHeadingTag(int positionOnLine, string line)
     {
         switch (positionOnLine)
