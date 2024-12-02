@@ -1,11 +1,19 @@
 ﻿using Markdown.MarkdownTags;
+using Markdown.MarkdownTagValidators;
 using Markdown.Tokens;
 using Markdown.Tokens.TagTokens;
 
 namespace Markdown.Parsers.TokensParsers;
 
-public class TokenParser : ITokensParser
+public class TokensParser : ITokensParser
 {
+    private readonly IMarkdownTagValidator validator;
+
+    public TokensParser(IMarkdownTagValidator validator)
+    {
+        this.validator = validator;
+    }
+
     public IEnumerable<MarkdownTag> ParserMarkdownTags(IEnumerable<IToken> paragraphOfTokens)
     {
         var tagTokens = GetTagTokens(paragraphOfTokens).ToList();
