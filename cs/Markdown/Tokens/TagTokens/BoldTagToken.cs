@@ -9,7 +9,7 @@ public class BoldTagToken : TagToken
         PositionInTokens = positionInTokens;
     }
 
-    private const string BoldTag = "_";
+    private const string BoldTag = "__";
     
     public override MarkdownTagType MarkdownTagType => MarkdownTagType.Bold;
 

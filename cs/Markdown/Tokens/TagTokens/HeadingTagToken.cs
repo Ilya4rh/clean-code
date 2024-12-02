@@ -9,7 +9,7 @@ public class HeadingTagToken : TagToken
         PositionInTokens = positionInTokens;
     }
 
-    private const string HeadingTag = "_";
+    private const string HeadingTag = "#";
 
     public override MarkdownTagType MarkdownTagType => MarkdownTagType.Heading;
 
