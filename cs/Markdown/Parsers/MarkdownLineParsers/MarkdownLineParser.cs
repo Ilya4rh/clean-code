@@ -1,5 +1,4 @@
-﻿using Markdown.MarkdownTags;
-using Markdown.Tokens;
+﻿using Markdown.Tokens;
 using Markdown.Tokens.CommonTokens;
 using Markdown.Tokens.TagTokens;
 
@@ -7,29 +6,22 @@ namespace Markdown.Parsers.MarkdownLineParsers;
 
 public class MarkdownLineParser : IMarkdownLineParser
 {
-    public IEnumerable<IToken> ParseMarkdownLineForTokens(string markdownText)
+    public IEnumerable<IToken> ParseParagraphForTokens(string markdownLineParagraph)
     {
-        var markdownLineParagraphs = ParseMarkdownTextIntoParagraphs(markdownText);
-
-        foreach (var paragraph in markdownLineParagraphs)
+        for (var i = 0; i < markdownLineParagraph.Length; i++)
         {
-            for (var i = 0; i < paragraph.Length; i++)
+            var symbol = markdownLineParagraph[i];
+                
+            if (TagToken.TryCreateTagToken(markdownLineParagraph, i, out var tagToken))
             {
-                var symbol = paragraph[i];
-                
-                if (TagToken.TryCreateTagToken(paragraph, i, out var tagToken))
-                {
-                    yield return tagToken!;
+                yield return tagToken!;
 
-                    MovePointer(tagToken!, ref i);
+                MovePointer(tagToken!, ref i);
                     
-                    continue;
-                }
-                
-                yield return CommonToken.CreateCommonToken(symbol);
+                continue;
             }
-            
-            yield return new NewLineToken();
+                
+            yield return CommonToken.CreateCommonToken(symbol);
         }
     }
 
@@ -38,9 +30,9 @@ public class MarkdownLineParser : IMarkdownLineParser
         pointer += tagToken.Content.Length - 1;
     } 
     
-    private static IEnumerable<string> ParseMarkdownTextIntoParagraphs(string markdownLine)
+    public IEnumerable<string> ParseMarkdownTextIntoParagraphs(string markdownText)
     {
-        var paragraphs = markdownLine.Split(Environment.NewLine);
+        var paragraphs = markdownText.Split(Environment.NewLine);
 
         foreach (var paragraph in paragraphs)
         {
