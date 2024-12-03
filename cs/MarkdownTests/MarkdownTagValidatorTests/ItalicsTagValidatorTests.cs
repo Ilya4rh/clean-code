@@ -1,110 +1,360 @@
-﻿using FluentAssertions;
-using Markdown.MarkdownTags;
-using Markdown.MarkdownTagValidators;
+﻿using Markdown.MarkdownTagValidators;
+using Markdown.Tokens;
+using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
 namespace MarkdownTests.MarkdownTagValidatorTests;
 
 public class ItalicsTagValidatorTests
 {
-    private IMarkdownTagValidator markdownTagValidator;
-    private readonly MarkdownTagType tagType = MarkdownTagType.Italics;
-
-    [OneTimeSetUp]
-    public void OneTimeSetup()
+    private readonly MarkdownTagValidator markdownTagValidator = new();
+    
+    [TestCaseSource(nameof(TestCases))]
+    public bool IsValid_ShouldValidateItalicsTag(TestCase testCase)
     {
-        markdownTagValidator = new MarkdownTagValidator();
+        return markdownTagValidator.IsValidTag(testCase.Tokens, testCase.OpeningTagToken, testCase.ClosingTagToken);
     }
     
-    [Test]
-    public void IsValidTag_ShouldBeFalse_WhenHasSpaceAfterOpenTag()
+    private static readonly IEnumerable<TestCaseData> TestCases = new[]
     {
-        var line = "_ Hello!_";
-
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 8);
-
-        isValidTag.Should().BeFalse();
-    }
-
-    [Test]
-    public void IsValidTag_ShouldBeFalse_WhenHasSpaceBeforeCloseTag()
-    {
-        var line = "_Hello! _";
-       
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 8);
-
-        isValidTag.Should().BeFalse();
-    }
-
-    [TestCase(3, 10, "Hel_lo, wo_rld!")]
-    [TestCase(0, 10, "_Hello, wo_rld!")]
-    [TestCase(2, 14, "He_llo, world!_")]
-    public void IsValidTag_ShouldBeFalse_WhenTagsInDifferentWords(int positionOpenTag, int positionCloseTag, string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
-
-        isValidTag.Should().BeFalse();
-    }
-
-    [TestCase(2, 4, "12_3_")]
-    [TestCase(0, 4, "_123_56")]
-    public void IsValidTag_ShouldBeFalse_WhenTagInsideTheTextWithNumbers(
-        int positionOpenTag, 
-        int positionCloseTag, 
-        string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
-
-        isValidTag.Should().BeFalse();
-    }
-
-    [TestCase(1, 7, @"\_Hello_")]
-    [TestCase(0, 7, @"_Hello\_")]
-    public void IsValidTag_ShouldBeFalse_WhenIsEscapedTag(int positionOpenTag, int positionCloseTag, string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
-
-        isValidTag.Should().BeFalse();
-    }
-
-    [TestCase(3, 9, @"\\\_Hello_")]
-    [TestCase(0, 11, @"_Hello\\\\\_")]
-    public void IsValidTag_ShouldBeFalse_WhenIsOddNumberOfEscapeChars(int positionOpenTag, int positionCloseTag, string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
-
-        isValidTag.Should().BeFalse();
-    }
-
-    [Test]
-    public void IsValid_ShouldBeTrue_WhenTagsAtTheBeginningAndEndOfTheLine()
-    {
-        var line = "_Hello, world!_";
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new SpaceToken(),
+                        new TextToken("Hello!"),
+                        new ItalicsTagToken(3),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(3)
+                }
+            )
+            .Returns(false)
+            .SetName("01. Невалидный тег. Пробел перед открывающим тегом. Строка: '_ Hello!_'"),
         
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, 0, line, 14);
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new SpaceToken(),
+                        new TextToken("Hello!"),
+                        new ItalicsTagToken(3),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(3)
+                }
+            )
+            .Returns(false)
+            .SetName("02. Невалидный тег. Пробел перед закрывающим тегом. Строка: '_Hello! _'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new TextToken("Hel"),
+                        new ItalicsTagToken(1),
+                        new TextToken("lo,"),
+                        new SpaceToken(),
+                        new TextToken("wo"),
+                        new ItalicsTagToken(5),
+                        new TextToken("rld!"),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(5)
+                }
+            )
+            .Returns(false)
+            .SetName("03. Невалидный тег. Теги в разных словах. Строка: 'Hel_lo, wo_rld!'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new TextToken("Hello,"),
+                        new SpaceToken(),
+                        new TextToken("wo"),
+                        new ItalicsTagToken(4),
+                        new TextToken("rld!"),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(5)
+                }
+            )
+            .Returns(false)
+            .SetName("04. Невалидный тег. Теги в разных словах. Строка: '_Hello, wo_rld!'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new TextToken("Hel"),
+                        new ItalicsTagToken(1),
+                        new TextToken("lo,"),
+                        new SpaceToken(),
+                        new TextToken("world!"),
+                        new ItalicsTagToken(5),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(5)
+                }
+            )
+            .Returns(false)
+            .SetName("05. Невалидный тег. Теги в разных словах. Строка: 'He_llo, world!_'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new DigitToken("1"),
+                        new DigitToken("2"),
+                        new ItalicsTagToken(2),
+                        new DigitToken("3"),
+                        new ItalicsTagToken(4),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(2),
+                    ClosingTagToken = new ItalicsTagToken(4)
+                }
+            )
+            .Returns(false)
+            .SetName("06. Невалидный тег. Теги внутри текста c цифрами. Строка: '12_3_'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new DigitToken("1"),
+                        new DigitToken("2"),
+                        new DigitToken("3"),
+                        new ItalicsTagToken(4),
+                        new DigitToken("4"),
+                        new DigitToken("5"),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(4)
+                }
+            )
+            .Returns(false)
+            .SetName("07. Невалидный тег. Теги внутри текста c цифрами. Строка: '_123_45'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new DigitToken("1"),
+                        new ItalicsTagToken(1),
+                        new DigitToken("2"),
+                        new TextToken("."),
+                        new DigitToken("3"),
+                        new ItalicsTagToken(5),
+                        new DigitToken("4"),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(5)
+                }
+            )
+            .Returns(false)
+            .SetName("08. Невалидный тег. Теги внутри текста c цифрами. Строка: '1_2.3_4'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new TextToken("Hello"),
+                        new ItalicsTagToken(1),
+                        new DigitToken("2"),
+                        new DigitToken("3"),
+                        new ItalicsTagToken(4),
+                        new DigitToken("4"),
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(4)
+                }
+            )
+            .Returns(false)
+            .SetName("09. Невалидный тег. Теги внутри текста c цифрами. Строка: 'Hello_23_4'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new EscapeToken(),
+                        new ItalicsTagToken(1),
+                        new TextToken("Hello"),
+                        new ItalicsTagToken(3)
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(3)
+                }
+            )
+            .Returns(false)
+            .SetName(@"10. Невалидный тег. Открывающий тег экранирован. Строка: '\_Hello_'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new TextToken("Hello"),
+                        new EscapeToken(),
+                        new ItalicsTagToken(3)
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(3)
+                }
+            )
+            .Returns(false)
+            .SetName(@"11. Невалидный тег. Закрывающий тег экранирован. Строка: '_Hello\_'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new TextToken("Hello,"),
+                        new SpaceToken(),
+                        new TextToken("world!"),
+                        new ItalicsTagToken(4)
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(4)
+                }
+            )
+            .Returns(true)
+            .SetName("12. Валидный тег. Текст между тегами. Строка: '_Hello, world!_'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new TextToken("He"),
+                        new ItalicsTagToken(2),
+                        new TextToken("llo,"),
+                        new SpaceToken(),
+                        new TextToken("world!")
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(2)
+                }
+            )
+            .Returns(true)
+            .SetName("13. Валидный тег. Теги в одном слове. Строка: '_He_llo, world!'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new TextToken("Ma"),
+                        new ItalicsTagToken(1),
+                        new TextToken("rkd"),
+                        new ItalicsTagToken(3),
+                        new TextToken("own")
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(3)
+                }
+            )
+            .Returns(true)
+            .SetName("14. Валидный тег. Теги в одном слове. Строка: 'Ma_rkd_own'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new TextToken("He"),
+                        new ItalicsTagToken(1),
+                        new TextToken("llo,"),
+                        new ItalicsTagToken(3),
+                        new SpaceToken(),
+                        new TextToken("world!")
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(1),
+                    ClosingTagToken = new ItalicsTagToken(3)
+                }
+            )
+            .Returns(true)
+            .SetName("15. Валидный тег. Теги в одном слове. Строка: 'He_llo,_ world!'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new EscapeToken(),
+                        new EscapeToken(),
+                        new ItalicsTagToken(2),
+                        new TextToken("Hello"),
+                        new ItalicsTagToken(4)
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(2),
+                    ClosingTagToken = new ItalicsTagToken(4)
+                }
+            )
+            .Returns(true)
+            .SetName(@"16. Валидный тег. Символ экранирования экранирован. Строка: '\\_Hello_'"),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    Tokens =
+                    [
+                        new ItalicsTagToken(0),
+                        new TextToken("Hello"),
+                        new EscapeToken(),
+                        new EscapeToken(),
+                        new ItalicsTagToken(4)
+                    ],
+                    OpeningTagToken = new ItalicsTagToken(0),
+                    ClosingTagToken = new ItalicsTagToken(4)
+                }
+            )
+            .Returns(true)
+            .SetName(@"17. Валидный тег. Символ экранирования экранирован. Строка: '_Hello\\_'"),
+    };
 
-        isValidTag.Should().BeTrue();
-    }
-
-    [TestCase(0, 3, "_He_llo, world!")]
-    [TestCase(2, 6, "Ma_rkd_own")]
-    [TestCase(2, 7, "He_llo,_ world!")]
-    public void IsValidTag_ShouldBeTrue_WhenTagsInOneWord(int positionOpenTag, int positionCloseTag, string line)
+    public record TestCase
     {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
-
-        isValidTag.Should().BeTrue();
-    }
-
-    [TestCase(4, 10, @"\\\\_Hello_")]
-    [TestCase(0, 8, @"_Hello\\_")]
-    public void IsValidTag_ShouldBeTrue_WhenIsEvenNumberOfEscapeChars(
-        int positionOpenTag, 
-        int positionCloseTag,
-        string line)
-    {
-        var isValidTag = markdownTagValidator.IsValidTag(tagType, positionOpenTag, line, positionCloseTag);
-
-        isValidTag.Should().BeTrue();
+        public required List<IToken> Tokens { get; init; }
+        
+        public required TagToken OpeningTagToken { get; init; }
+        
+        public required TagToken ClosingTagToken { get; init; }
     }
 }

@@ -46,7 +46,7 @@ public class MarkdownTagValidator : IMarkdownTagValidator
         TagToken closingTagToken,
         MarkdownTagType? externalTagType)
     {
-        if (openingTagToken.PositionInTokens + openingTagToken.Content.Length == closingTagToken.PositionInTokens)
+        if (openingTagToken.PositionInTokens + 1 == closingTagToken.PositionInTokens)
             return false;
         if (externalTagType is MarkdownTagType.Italics)
             return false;
@@ -60,7 +60,7 @@ public class MarkdownTagValidator : IMarkdownTagValidator
         TagToken closingTagToken)
     {
         var positionOpening = openingTagToken.PositionInTokens;
-        var positionClosing = openingTagToken.PositionInTokens;
+        var positionClosing = closingTagToken.PositionInTokens;
         
         // Подумать о выносе этих метод из класса
         if (IsSpaceAfterTagToken(paragraphOfTokens, positionOpening) || 
@@ -136,7 +136,7 @@ public class MarkdownTagValidator : IMarkdownTagValidator
     private static bool IsTagOnNumber(List<IToken> paragraphOfTokens, int tagTokenPosition)
     {
         return paragraphOfTokens[tagTokenPosition - 1].Type == TokenType.Digit && 
-               paragraphOfTokens[tagTokenPosition - 1].Type == TokenType.Digit;
+               paragraphOfTokens[tagTokenPosition + 1].Type == TokenType.Digit;
     }
 
     private static bool IsScreenedTag(List<IToken> paragraphOfTokens, int tagPosition)
@@ -149,6 +149,7 @@ public class MarkdownTagValidator : IMarkdownTagValidator
         if (tagPosition == 1 && previousToken.Type == TokenType.Screening)
             return true;
 
-        return paragraphOfTokens[tagPosition - 2].Type != TokenType.Screening;
+        return 
+            previousToken.Type == TokenType.Screening && paragraphOfTokens[tagPosition - 2].Type != TokenType.Screening;
     }
 }
