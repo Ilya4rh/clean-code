@@ -12,7 +12,7 @@ public abstract class CommonToken : IToken
         if (char.IsWhiteSpace(symbol))
             return new SpaceToken();
         if (symbol == '\\')
-            return new ScreeningToken();
+            return new EscapeToken();
 
         return new TextToken(symbol.ToString());
     }

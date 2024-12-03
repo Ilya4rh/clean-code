@@ -69,7 +69,7 @@ public class MarkdownLineParserTests
         
         var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
 
-        paragraphOfTokens.Should().BeEquivalentTo([new ScreeningToken()]);
+        paragraphOfTokens.Should().BeEquivalentTo([new EscapeToken()]);
     }
     
     [Test]

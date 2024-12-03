@@ -1,6 +1,6 @@
 ﻿namespace Markdown.Tokens.CommonTokens;
 
-public class ScreeningToken : CommonToken
+public class EscapeToken : CommonToken
 {
     public override TokenType Type => TokenType.Screening;
 
