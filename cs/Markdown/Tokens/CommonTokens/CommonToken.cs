@@ -5,15 +5,26 @@ public abstract class CommonToken : IToken
     public abstract TokenType Type { get; }
     public abstract string Content { get; }
 
-    public static CommonToken CreateCommonToken(char symbol)
+    public static TokenType GetCommonTokenType(char symbol)
     {
         if (char.IsDigit(symbol))
-            return new DigitToken(symbol.ToString());
+            return TokenType.Digit;
         if (char.IsWhiteSpace(symbol))
-            return new SpaceToken();
+            return TokenType.Space;
         if (symbol == '\\')
-            return new EscapeToken();
+            return TokenType.Escape;
 
-        return new TextToken(symbol.ToString());
+        return TokenType.Text;
+    }
+    
+    public static CommonToken CreateCommonToken(TokenType tokenType, string content)
+    {
+        return tokenType switch
+        {
+            TokenType.Digit => new DigitToken(content),
+            TokenType.Space => new SpaceToken(),
+            TokenType.Escape => new EscapeToken(),
+            _ => new TextToken(content)
+        };
     }
 }
