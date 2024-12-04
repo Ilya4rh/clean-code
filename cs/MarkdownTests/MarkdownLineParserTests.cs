@@ -78,10 +78,31 @@ public class MarkdownLineParserTests
         const string paragraph = "Abc!";
         var expectedTokens = new List<IToken>
         {
-            new TextToken("A"), 
-            new TextToken("b"), 
-            new TextToken("c"), 
-            new TextToken("!")
+            new TextToken("Abc!")
+        };
+        
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
+
+        paragraphOfTokens.Should().BeEquivalentTo(expectedTokens);
+    }
+
+    [Test]
+    public void ParseParagraphForTokens_ShouldDefineAllTokens()
+    {
+        const string paragraph = @"# _Hello_ __world1\__";
+        var expectedTokens = new List<IToken>()
+        {
+            new HeadingTagToken(0),
+            new SpaceToken(),
+            new ItalicsTagToken(2),
+            new TextToken("Hello"),
+            new ItalicsTagToken(3),
+            new SpaceToken(),
+            new BoldTagToken(4),
+            new TextToken("world"),
+            new DigitToken("1"),
+            new EscapeToken(),
+            new BoldTagToken(8)
         };
         
         var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
