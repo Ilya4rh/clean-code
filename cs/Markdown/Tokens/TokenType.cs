@@ -6,6 +6,6 @@ public enum TokenType
     Digit,
     Space,
     NewLine,
-    Screening,
+    Escape,
     Tag
 }

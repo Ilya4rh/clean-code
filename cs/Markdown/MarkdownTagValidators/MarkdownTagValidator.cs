@@ -70,8 +70,8 @@ public class MarkdownTagValidator : IMarkdownTagValidator
             return false;
         if (IsTagsInsideTheTextWithNumbers(paragraphOfTokens, positionOpening, positionClosing))
             return false;
-        if (IsScreenedTag(paragraphOfTokens, openingTagToken.PositionInTokens) ||
-            IsScreenedTag(paragraphOfTokens, closingTagToken.PositionInTokens))
+        if (IsEscapedTag(paragraphOfTokens, openingTagToken.PositionInTokens) ||
+            IsEscapedTag(paragraphOfTokens, closingTagToken.PositionInTokens))
             return false;
         
         return true;
@@ -139,17 +139,17 @@ public class MarkdownTagValidator : IMarkdownTagValidator
                paragraphOfTokens[tagTokenPosition + 1].Type == TokenType.Digit;
     }
 
-    private static bool IsScreenedTag(List<IToken> paragraphOfTokens, int tagPosition)
+    private static bool IsEscapedTag(List<IToken> paragraphOfTokens, int tagPosition)
     {
         if (tagPosition == 0)
             return false;
 
         var previousToken = paragraphOfTokens[tagPosition - 1];
         
-        if (tagPosition == 1 && previousToken.Type == TokenType.Screening)
+        if (tagPosition == 1 && previousToken.Type == TokenType.Escape)
             return true;
 
         return 
-            previousToken.Type == TokenType.Screening && paragraphOfTokens[tagPosition - 2].Type != TokenType.Screening;
+            previousToken.Type == TokenType.Escape && paragraphOfTokens[tagPosition - 2].Type != TokenType.Escape;
     }
 }

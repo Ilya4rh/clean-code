@@ -63,7 +63,7 @@ public class MarkdownLineParserTests
     }
     
     [Test]
-    public void ParseParagraphForTokens_ShouldDefineScreeningToken()
+    public void ParseParagraphForTokens_ShouldDefineEscapeToken()
     {
         const string paragraph = "\\";
         
