@@ -35,6 +35,4 @@ public abstract class TagToken : IToken
         tagToken = null;
         return false;
     }
-    
-    // public abstract bool IsTagToken(string line, int position);
 }
