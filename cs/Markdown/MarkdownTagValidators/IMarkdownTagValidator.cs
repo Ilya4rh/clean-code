@@ -6,17 +6,12 @@ namespace Markdown.MarkdownTagValidators;
 
 public interface IMarkdownTagValidator
 {
-    /// <summary>
-    /// Проверяет валидность тэга 
-    /// </summary>
-    /// <param name="paragraphOfTokens"></param>
-    /// <param name="openingTagToken"></param>
-    /// <param name="closingTagToken"></param>
-    /// <param name="externalTagType"> Тип внешнего тэга, для текущего </param>
-    /// <returns></returns>
-    public bool IsValidTag(
+    public bool IsValidSingleTag(
         List<IToken> paragraphOfTokens,
-        TagToken openingTagToken,
-        TagToken? closingTagToken = null,
+        ISingleMarkdownTag singleTag);
+
+    public bool IsValidPairedTag(
+        List<IToken> paragraphOfTokens, 
+        IPairedMarkdownTags pairedTags,
         MarkdownTagType? externalTagType = null);
 }

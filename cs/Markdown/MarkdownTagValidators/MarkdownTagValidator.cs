@@ -6,21 +6,29 @@ namespace Markdown.MarkdownTagValidators;
 
 public class MarkdownTagValidator : IMarkdownTagValidator
 {
-    public bool IsValidTag(
+    public bool IsValidSingleTag(
         List<IToken> paragraphOfTokens, 
-        TagToken openingTagToken, 
-        TagToken? closingTagToken = null,
-        MarkdownTagType? externalTagType = null)
+        ISingleMarkdownTag singleTag)
     {
-        return openingTagToken.MarkdownTagType switch
+        return singleTag.Token.MarkdownTagType switch
         {
-            MarkdownTagType.Heading => IsValidHeadingTag(openingTagToken, paragraphOfTokens),
-            MarkdownTagType.Italics => IsValidItalicsTag(paragraphOfTokens, openingTagToken, closingTagToken!),
-            MarkdownTagType.Bold => IsValidBoldTag(paragraphOfTokens, openingTagToken, closingTagToken!, externalTagType),
+            MarkdownTagType.Heading => IsValidHeadingTag(singleTag.Token, paragraphOfTokens),
             _ => false
         };
     }
-    
+
+    public bool IsValidPairedTag(
+        List<IToken> paragraphOfTokens, 
+        IPairedMarkdownTags pairedTags, 
+        MarkdownTagType? externalTagType = null)
+    {
+        return pairedTags.OpeningToken.MarkdownTagType switch
+        {
+            MarkdownTagType.Italics => IsValidItalicsTag(paragraphOfTokens, pairedTags),
+            MarkdownTagType.Bold => IsValidBoldTag(paragraphOfTokens, pairedTags, externalTagType),
+            _ => false
+        };
+    }
     
     private static bool IsValidHeadingTag(TagToken tagToken, List<IToken> paragraphOfTokens)
     {
@@ -34,33 +42,30 @@ public class MarkdownTagValidator : IMarkdownTagValidator
 
     private static bool IsValidItalicsTag(
         List<IToken> paragraphOfTokens, 
-        TagToken openingTagToken, 
-        TagToken closingTagToken)
+        IPairedMarkdownTags pairedTags)
     {
-        return IsValidPairedTag(paragraphOfTokens, openingTagToken, closingTagToken);
+        return IsValidPairedTags(paragraphOfTokens, pairedTags);
     }
 
     private static bool IsValidBoldTag(
         List<IToken> paragraphOfTokens, 
-        TagToken openingTagToken, 
-        TagToken closingTagToken,
+        IPairedMarkdownTags pairedTags,
         MarkdownTagType? externalTagType)
     {
-        if (openingTagToken.PositionInTokens + 1 == closingTagToken.PositionInTokens)
+        if (pairedTags.OpeningToken.PositionInTokens + 1 == pairedTags.ClosingToken.PositionInTokens)
             return false;
         if (externalTagType is MarkdownTagType.Italics)
             return false;
 
-        return IsValidPairedTag(paragraphOfTokens, openingTagToken, closingTagToken);
+        return IsValidPairedTags(paragraphOfTokens, pairedTags);
     }
     
-    private static bool IsValidPairedTag( 
+    private static bool IsValidPairedTags( 
         List<IToken> paragraphOfTokens, 
-        TagToken openingTagToken, 
-        TagToken closingTagToken)
+        IPairedMarkdownTags pairedTags)
     {
-        var positionOpening = openingTagToken.PositionInTokens;
-        var positionClosing = closingTagToken.PositionInTokens;
+        var positionOpening = pairedTags.OpeningToken.PositionInTokens;
+        var positionClosing = pairedTags.ClosingToken.PositionInTokens;
         
         // Подумать о выносе этих метод из класса
         if (IsSpaceAfterTagToken(paragraphOfTokens, positionOpening) || 
@@ -70,8 +75,8 @@ public class MarkdownTagValidator : IMarkdownTagValidator
             return false;
         if (IsTagsInsideTheTextWithNumbers(paragraphOfTokens, positionOpening, positionClosing))
             return false;
-        if (IsEscapedTag(paragraphOfTokens, openingTagToken.PositionInTokens) ||
-            IsEscapedTag(paragraphOfTokens, closingTagToken.PositionInTokens))
+        if (IsEscapedTag(paragraphOfTokens, positionOpening) ||
+            IsEscapedTag(paragraphOfTokens, positionClosing))
             return false;
         
         return true;
