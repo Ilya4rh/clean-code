@@ -10,5 +10,5 @@ public interface IPairedMarkdownTags : IMarkdownTag
 
     bool IsIntersect(IPairedMarkdownTags pairedMarkdownTags);
 
-    bool IsExternal(IPairedMarkdownTags pairedMarkdownTags);
+    bool IsExternalFor(IPairedMarkdownTags pairedMarkdownTags);
 }

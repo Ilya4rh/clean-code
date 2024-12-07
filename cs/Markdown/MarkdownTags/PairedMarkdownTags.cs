@@ -15,11 +15,20 @@ public class PairedMarkdownTags : IPairedMarkdownTags
     
     public bool IsIntersect(IPairedMarkdownTags pairedMarkdownTags)
     {
-        throw new NotImplementedException();
+        if (IsExternalFor(pairedMarkdownTags) || pairedMarkdownTags.IsExternalFor(this))
+        {
+            return false;
+        }
+
+        return (pairedMarkdownTags.OpeningToken.PositionInTokens < ClosingToken.PositionInTokens &&
+               ClosingToken.PositionInTokens < pairedMarkdownTags.ClosingToken.PositionInTokens) || 
+               (OpeningToken.PositionInTokens < pairedMarkdownTags.ClosingToken.PositionInTokens && 
+                pairedMarkdownTags.ClosingToken.PositionInTokens < ClosingToken.PositionInTokens);
     }
 
-    public bool IsExternal(IPairedMarkdownTags pairedMarkdownTags)
+    public bool IsExternalFor(IPairedMarkdownTags pairedMarkdownTags)
     {
-        throw new NotImplementedException();
+        return OpeningToken.PositionInTokens < pairedMarkdownTags.OpeningToken.PositionInTokens &&
+               pairedMarkdownTags.ClosingToken.PositionInTokens < ClosingToken.PositionInTokens;
     }
 }
