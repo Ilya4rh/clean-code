@@ -1,4 +1,5 @@
-﻿using Markdown.MarkdownTagValidators;
+﻿using Markdown.MarkdownTags;
+using Markdown.MarkdownTagValidators;
 using Markdown.Tokens;
 using Markdown.Tokens.CommonTokens;
 using Markdown.Tokens.TagTokens;
@@ -13,7 +14,9 @@ public class ItalicsTagValidatorTests
     [TestCaseSource(nameof(TestCases))]
     public bool IsValid_ShouldValidateItalicsTag(TestCase testCase)
     {
-        return markdownTagValidator.IsValidTag(testCase.Tokens, testCase.OpeningTagToken, testCase.ClosingTagToken);
+        return markdownTagValidator.IsValidPairedTag(
+            testCase.Tokens, 
+            testCase.PairedMarkdownTags);
     }
     
     private static readonly IEnumerable<TestCaseData> TestCases = new[]
@@ -29,8 +32,9 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello!"),
                         new ItalicsTagToken(3),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(3))
                 }
             )
             .Returns(false)
@@ -47,8 +51,9 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello!"),
                         new ItalicsTagToken(3),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(3))
                 }
             )
             .Returns(false)
@@ -68,8 +73,9 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(5),
                         new TextToken("rld!"),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(5))
                 }
             )
             .Returns(false)
@@ -88,8 +94,9 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(4),
                         new TextToken("rld!"),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(false)
@@ -108,8 +115,9 @@ public class ItalicsTagValidatorTests
                         new TextToken("world!"),
                         new ItalicsTagToken(5),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(5))
                 }
             )
             .Returns(false)
@@ -127,8 +135,9 @@ public class ItalicsTagValidatorTests
                         new DigitToken("3"),
                         new ItalicsTagToken(4),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(2),
-                    ClosingTagToken = new ItalicsTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(2),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(false)
@@ -148,8 +157,9 @@ public class ItalicsTagValidatorTests
                         new DigitToken("4"),
                         new DigitToken("5"),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(false)
@@ -169,8 +179,9 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(5),
                         new DigitToken("4"),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(5))
                 }
             )
             .Returns(false)
@@ -189,8 +200,9 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(4),
                         new DigitToken("4"),
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(false)
@@ -207,8 +219,9 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello"),
                         new ItalicsTagToken(3)
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(3))
                 }
             )
             .Returns(false)
@@ -225,8 +238,9 @@ public class ItalicsTagValidatorTests
                         new EscapeToken(),
                         new ItalicsTagToken(3)
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(3))
                 }
             )
             .Returns(false)
@@ -244,8 +258,9 @@ public class ItalicsTagValidatorTests
                         new TextToken("world!"),
                         new ItalicsTagToken(4)
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(true)
@@ -264,8 +279,9 @@ public class ItalicsTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(2)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(2))
                 }
             )
             .Returns(true)
@@ -283,8 +299,9 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(3),
                         new TextToken("own")
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(3))
                 }
             )
             .Returns(true)
@@ -303,8 +320,9 @@ public class ItalicsTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    OpeningTagToken = new ItalicsTagToken(1),
-                    ClosingTagToken = new ItalicsTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(1),
+                        new ItalicsTagToken(3))
                 }
             )
             .Returns(true)
@@ -322,8 +340,9 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello"),
                         new ItalicsTagToken(4)
                     ],
-                    OpeningTagToken = new ItalicsTagToken(2),
-                    ClosingTagToken = new ItalicsTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(2),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(true)
@@ -341,8 +360,9 @@ public class ItalicsTagValidatorTests
                         new EscapeToken(),
                         new ItalicsTagToken(4)
                     ],
-                    OpeningTagToken = new ItalicsTagToken(0),
-                    ClosingTagToken = new ItalicsTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new ItalicsTagToken(0),
+                        new ItalicsTagToken(4))
                 }
             )
             .Returns(true)
@@ -353,8 +373,6 @@ public class ItalicsTagValidatorTests
     {
         public required List<IToken> Tokens { get; init; }
         
-        public required TagToken OpeningTagToken { get; init; }
-        
-        public required TagToken ClosingTagToken { get; init; }
+        public required IPairedMarkdownTags PairedMarkdownTags { get; init; }
     }
 }

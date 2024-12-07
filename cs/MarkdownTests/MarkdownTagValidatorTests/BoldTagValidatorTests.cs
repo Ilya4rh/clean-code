@@ -15,10 +15,9 @@ public class BoldTagValidatorTests
     [TestCaseSource(nameof(TestCases))]
     public bool IsValid_ShouldValidateBoldTag(TestCase testCase)
     {
-        return markdownTagValidator.IsValidTag(
-            testCase.Tokens, 
-            testCase.OpeningTagToken, 
-            testCase.ClosingTagToken,
+        return markdownTagValidator.IsValidPairedTag(
+            testCase.Tokens,
+            testCase.PairedMarkdownTags,
             testCase.ExternalTagType);
     }
     
@@ -35,8 +34,9 @@ public class BoldTagValidatorTests
                         new TextToken("Hello!"),
                         new BoldTagToken(3),
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(false)
@@ -53,8 +53,9 @@ public class BoldTagValidatorTests
                         new TextToken("Hello!"),
                         new BoldTagToken(3),
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(false)
@@ -74,8 +75,9 @@ public class BoldTagValidatorTests
                         new BoldTagToken(5),
                         new TextToken("rld!"),
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(5))
                 }
             )
             .Returns(false)
@@ -94,8 +96,9 @@ public class BoldTagValidatorTests
                         new BoldTagToken(4),
                         new TextToken("rld!"),
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(5))
                 }
             )
             .Returns(false)
@@ -114,8 +117,9 @@ public class BoldTagValidatorTests
                         new TextToken("world!"),
                         new BoldTagToken(5),
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(5))
                 }
             )
             .Returns(false)
@@ -133,8 +137,9 @@ public class BoldTagValidatorTests
                         new DigitToken("3"),
                         new BoldTagToken(4),
                     ],
-                    OpeningTagToken = new BoldTagToken(2),
-                    ClosingTagToken = new BoldTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(2), 
+                        new BoldTagToken(4))
                 }
             )
             .Returns(false)
@@ -154,8 +159,9 @@ public class BoldTagValidatorTests
                         new DigitToken("4"),
                         new DigitToken("5"),
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(4))
                 }
             )
             .Returns(false)
@@ -175,8 +181,9 @@ public class BoldTagValidatorTests
                         new BoldTagToken(5),
                         new DigitToken("4"),
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(5)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(5))
                 }
             )
             .Returns(false)
@@ -195,8 +202,9 @@ public class BoldTagValidatorTests
                         new BoldTagToken(4),
                         new DigitToken("4"),
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(4))
                 }
             )
             .Returns(false)
@@ -213,8 +221,9 @@ public class BoldTagValidatorTests
                         new TextToken("Hello"),
                         new BoldTagToken(3)
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(false)
@@ -231,8 +240,9 @@ public class BoldTagValidatorTests
                         new EscapeToken(),
                         new BoldTagToken(3)
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(false)
@@ -251,8 +261,9 @@ public class BoldTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    OpeningTagToken = new BoldTagToken(2),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(2), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(false)
@@ -275,8 +286,9 @@ public class BoldTagValidatorTests
                         new TextToken("world"),
                         new ItalicsTagToken(8)
                     ],
-                    OpeningTagToken = new BoldTagToken(2),
-                    ClosingTagToken = new BoldTagToken(3),
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                            new BoldTagToken(3), 
+                            new BoldTagToken(5)),
                     ExternalTagType = MarkdownTagType.Italics
                 }
             )
@@ -295,8 +307,9 @@ public class BoldTagValidatorTests
                         new TextToken("world!"),
                         new BoldTagToken(4)
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(4))
                 }
             )
             .Returns(true)
@@ -315,8 +328,9 @@ public class BoldTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(2)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(2))
                 }
             )
             .Returns(true)
@@ -334,8 +348,9 @@ public class BoldTagValidatorTests
                         new BoldTagToken(3),
                         new TextToken("own")
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(true)
@@ -354,8 +369,9 @@ public class BoldTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    OpeningTagToken = new BoldTagToken(1),
-                    ClosingTagToken = new BoldTagToken(3)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(1), 
+                        new BoldTagToken(3))
                 }
             )
             .Returns(true)
@@ -373,8 +389,9 @@ public class BoldTagValidatorTests
                         new TextToken("Hello"),
                         new BoldTagToken(4)
                     ],
-                    OpeningTagToken = new BoldTagToken(2),
-                    ClosingTagToken = new BoldTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(2), 
+                        new BoldTagToken(4))
                 }
             )
             .Returns(true)
@@ -392,8 +409,9 @@ public class BoldTagValidatorTests
                         new EscapeToken(),
                         new BoldTagToken(4)
                     ],
-                    OpeningTagToken = new BoldTagToken(0),
-                    ClosingTagToken = new BoldTagToken(4)
+                    PairedMarkdownTags = new PairedMarkdownTags(
+                        new BoldTagToken(0), 
+                        new BoldTagToken(4))
                 }
             )
             .Returns(true)
@@ -404,9 +422,7 @@ public class BoldTagValidatorTests
     {
         public required List<IToken> Tokens { get; init; }
         
-        public required TagToken OpeningTagToken { get; init; }
-        
-        public required TagToken ClosingTagToken { get; init; }
+        public required IPairedMarkdownTags PairedMarkdownTags { get; init; }
 
         public MarkdownTagType? ExternalTagType { get; init; }
     }

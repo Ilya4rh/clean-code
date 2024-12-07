@@ -12,14 +12,15 @@ namespace MarkdownTests.MarkdownTagValidatorTests;
 public class HeadingTagValidatorTests
 {
     private readonly MarkdownTagValidator markdownTagValidator = new();
-    private const MarkdownTagType TagType = MarkdownTagType.Heading;
 
     [Test]
     public void IsValidTag_ShouldBeFalse_WhenHeadingTagTokenPositionIsNotZero()
     {
         var paragraphOfTokens = new List<IToken> { new TextToken("A"), new HeadingTagToken(1)  };
         
-        var isValidTag = markdownTagValidator.IsValidTag(paragraphOfTokens, new HeadingTagToken(1));
+        var isValidTag = markdownTagValidator.IsValidSingleTag(
+            paragraphOfTokens, 
+            new SingleMarkdownTag(new HeadingTagToken(1)));
         
         isValidTag.Should().BeFalse();
     }
@@ -29,7 +30,9 @@ public class HeadingTagValidatorTests
     {
         var paragraphOfTokens = new List<IToken> { new HeadingTagToken(0), new TextToken("A") };
         
-        var isValidTag = markdownTagValidator.IsValidTag(paragraphOfTokens, new HeadingTagToken(0));
+        var isValidTag = markdownTagValidator.IsValidSingleTag(
+            paragraphOfTokens, 
+            new SingleMarkdownTag(new HeadingTagToken(0)));
         
         isValidTag.Should().BeFalse();
     }
@@ -42,7 +45,9 @@ public class HeadingTagValidatorTests
             new HeadingTagToken(0), new SpaceToken(), new TextToken("A")
         };
         
-        var isValid = markdownTagValidator.IsValidTag(paragraphOfTokens, new HeadingTagToken(0));
+        var isValid = markdownTagValidator.IsValidSingleTag(
+            paragraphOfTokens,
+            new SingleMarkdownTag(new HeadingTagToken(0)));
 
         isValid.Should().BeTrue();
     }
