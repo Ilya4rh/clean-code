@@ -5,5 +5,5 @@ namespace Markdown.Parsers.TokensParsers;
 
 public interface ITokensParser
 {
-    IEnumerable<MarkdownTag> ParserMarkdownTags(IEnumerable<IToken> paragraphOfTokens);
+    IEnumerable<IMarkdownTag> ParserMarkdownTags(List<IToken> paragraphOfTokens);
 }
