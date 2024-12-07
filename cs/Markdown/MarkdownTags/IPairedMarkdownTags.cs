@@ -2,7 +2,7 @@
 
 namespace Markdown.MarkdownTags;
 
-public interface IPairedMarkdownTags
+public interface IPairedMarkdownTags : IMarkdownTag
 {
     TagToken OpeningToken { get; }
     

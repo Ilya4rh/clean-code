@@ -2,7 +2,7 @@
 
 namespace Markdown.MarkdownTags;
 
-public interface ISingleMarkdownTag
+public interface ISingleMarkdownTag : IMarkdownTag
 {
     TagToken Token { get; }
 }
