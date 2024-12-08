@@ -37,12 +37,7 @@ public class PairedMarkdownTagTokens : IPairedMarkdownTagTokens
                pairedMarkdownTagTokens.Closing.PositionInTokens < Closing.PositionInTokens;
     }
 
-    public static bool IsPairedMarkdownTagTokens(TagToken tagToken)
-    {
-        return tagToken.Content is "__" or "_";
-    }
-
-    public static bool TryCreatePairedMarkdownTagTokens(
+    public static bool TryCreate(
         TagToken opening,
         TagToken closing,
         out PairedMarkdownTagTokens? pairedMarkdownTagTokens)

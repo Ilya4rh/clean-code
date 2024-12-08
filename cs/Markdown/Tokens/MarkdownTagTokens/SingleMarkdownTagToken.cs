@@ -15,7 +15,7 @@ public class SingleMarkdownTagToken : ISingleMarkdownTagToken
     
     public MarkdownTagType TagType { get; }
     
-    public static bool TryCreateSingleMarkdownTagToken(
+    public static bool TryCreate(
         TagToken tagToken, 
         out SingleMarkdownTagToken? singleMarkdownTagToken)
     {
