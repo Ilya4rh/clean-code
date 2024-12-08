@@ -5,7 +5,7 @@ namespace Markdown.Tokens.MarkdownTagTokens;
 
 public class SingleMarkdownTagToken : ISingleMarkdownTagToken
 {
-    public SingleMarkdownTagToken(TagToken token, MarkdownTagType tagType)
+    public SingleMarkdownTagToken(MarkdownTagType tagType, TagToken token)
     {
         Token = token;
         TagType = tagType;
