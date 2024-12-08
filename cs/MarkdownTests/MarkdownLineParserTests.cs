@@ -96,13 +96,13 @@ public class MarkdownLineParserTests
             new SpaceToken(),
             new ItalicsTagToken(2),
             new TextToken("Hello"),
-            new ItalicsTagToken(3),
+            new ItalicsTagToken(4),
             new SpaceToken(),
-            new BoldTagToken(4),
+            new BoldTagToken(6),
             new TextToken("world"),
             new DigitToken("1"),
             new EscapeToken(),
-            new BoldTagToken(8)
+            new BoldTagToken(10)
         };
         
         var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);

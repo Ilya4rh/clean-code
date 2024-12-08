@@ -9,48 +9,51 @@ public class MarkdownLineParser : IMarkdownLineParser
 {
     public IEnumerable<IToken> ParseParagraphForTokens(string markdownLineParagraph)
     {
-        var previousTokenPosition = -1;
-        var previousTokenLength = -1;
+        var tokens = new List<IToken>();
+        var previousTokenPositionInParagraph = -1;
         
         for (var i = 0; i < markdownLineParagraph.Length; i++)
         {
-            if (i < previousTokenLength + previousTokenPosition)
+            if (tokens.Count > 0 && i < tokens[^1].Content.Length + previousTokenPositionInParagraph)
                 continue;
             
-            previousTokenPosition = i;
-            var symbol = markdownLineParagraph[i];
-                
-            if (TagToken.TryCreateTagToken(markdownLineParagraph, i, out var tagToken))
+            if (TagToken.TryCreateTagToken(markdownLineParagraph, i, tokens.Count, out var tagToken))
             {
-                yield return tagToken!;
-                previousTokenLength = tagToken!.Content.Length;
+                tokens.Add(tagToken!);
+                previousTokenPositionInParagraph = i;
                 continue;
             }
-
+            
+            var symbol = markdownLineParagraph[i];
             var commonTokenType = CommonToken.GetCommonTokenType(symbol);
             var tokenContent = symbol.ToString();
-            
+
             if (commonTokenType == TokenType.Text)
-                tokenContent += CompleteTextTokenContent(markdownLineParagraph, i + 1, commonTokenType);
+                tokenContent += CompleteTextTokenContent(markdownLineParagraph, i + 1, tokens.Count, commonTokenType);
 
             var commonToken = CommonToken.CreateCommonToken(commonTokenType, tokenContent);
-            yield return commonToken;
-            previousTokenLength = commonToken.Content.Length;
+            tokens.Add(commonToken);
+            previousTokenPositionInParagraph = i;
         }
+
+        return tokens;
     }
 
-    private static string CompleteTextTokenContent(string line, int position, TokenType tokenType)
+    private static string CompleteTextTokenContent(string line, int positionInLine, int positionInTokens, TokenType tokenType)
     {
         var content = new StringBuilder();
         
-        for (; position < line.Length; position++)
+        for (; positionInLine < line.Length; positionInLine++)
         {
-            var currentTokenType = CommonToken.GetCommonTokenType(line[position]);
+            var currentTokenType = CommonToken.GetCommonTokenType(line[positionInLine]);
             
-            if (tokenType != currentTokenType || TagToken.TryCreateTagToken(line, position, out _))
+            if (tokenType != currentTokenType || 
+                TagToken.TryCreateTagToken(line, positionInLine, positionInTokens, out _))
+            {
                 break;
+            }
 
-            content.Append(line[position]);
+            content.Append(line[positionInLine]);
         }
 
         return content.ToString();
