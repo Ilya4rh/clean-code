@@ -4,8 +4,6 @@ namespace Markdown.Tokens.TagTokens;
 
 public abstract class TagToken : IToken
 {
-    public abstract MarkdownTagType MarkdownTagType { get; }
-    
     public TokenType Type => TokenType.Tag;
 
     public abstract string Content { get; }
