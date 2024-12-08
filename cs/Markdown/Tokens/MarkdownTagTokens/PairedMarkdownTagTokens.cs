@@ -36,4 +36,34 @@ public class PairedMarkdownTagTokens : IPairedMarkdownTagTokens
         return Opening.PositionInTokens < pairedMarkdownTagTokens.Opening.PositionInTokens &&
                pairedMarkdownTagTokens.Closing.PositionInTokens < Closing.PositionInTokens;
     }
+
+    public static bool IsPairedMarkdownTagTokens(TagToken tagToken)
+    {
+        return tagToken.Content is "__" or "_";
+    }
+
+    public static bool TryCreatePairedMarkdownTagTokens(
+        TagToken opening,
+        TagToken closing,
+        out PairedMarkdownTagTokens? pairedMarkdownTagTokens)
+    {
+        if (opening.Content != closing.Content)
+        {
+            pairedMarkdownTagTokens = null;
+            return false;
+        }
+
+        switch (opening.Content)
+        {
+            case BoldTagToken.BoldTokenContent:
+                pairedMarkdownTagTokens = new PairedMarkdownTagTokens(MarkdownTagType.Bold, opening, closing);
+                return true;
+            case ItalicsTagToken.ItalicsTokenContent:
+                pairedMarkdownTagTokens = new PairedMarkdownTagTokens(MarkdownTagType.Italics, opening, closing);
+                return true;
+            default:
+                pairedMarkdownTagTokens = null;
+                return false;
+        }
+    }
 }

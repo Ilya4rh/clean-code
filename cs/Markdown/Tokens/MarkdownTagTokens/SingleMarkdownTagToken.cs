@@ -14,4 +14,18 @@ public class SingleMarkdownTagToken : ISingleMarkdownTagToken
     public TagToken Token { get; }
     
     public MarkdownTagType TagType { get; }
+    
+    public static bool TryCreateSingleMarkdownTagToken(
+        TagToken tagToken, 
+        out SingleMarkdownTagToken? singleMarkdownTagToken)
+    {
+        if (tagToken.Content == HeadingTagToken.HeadingTokenContent)
+        {
+            singleMarkdownTagToken = new SingleMarkdownTagToken(MarkdownTagType.Heading, tagToken);
+            return true;
+        }
+
+        singleMarkdownTagToken = null;
+        return false;
+    }
 }
