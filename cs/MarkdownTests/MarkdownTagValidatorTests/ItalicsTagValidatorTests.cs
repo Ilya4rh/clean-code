@@ -2,6 +2,7 @@
 using Markdown.MarkdownTagValidators;
 using Markdown.Tokens;
 using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.MarkdownTagTokens;
 using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
@@ -32,7 +33,8 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello!"),
                         new ItalicsTagToken(3),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(3))
                 }
@@ -51,7 +53,8 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello!"),
                         new ItalicsTagToken(3),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(3))
                 }
@@ -73,7 +76,8 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(5),
                         new TextToken("rld!"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(5))
                 }
@@ -94,7 +98,8 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(4),
                         new TextToken("rld!"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(4))
                 }
@@ -115,7 +120,8 @@ public class ItalicsTagValidatorTests
                         new TextToken("world!"),
                         new ItalicsTagToken(5),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(5))
                 }
@@ -135,7 +141,8 @@ public class ItalicsTagValidatorTests
                         new DigitToken("3"),
                         new ItalicsTagToken(4),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(2),
                         new ItalicsTagToken(4))
                 }
@@ -157,7 +164,8 @@ public class ItalicsTagValidatorTests
                         new DigitToken("4"),
                         new DigitToken("5"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(4))
                 }
@@ -179,7 +187,8 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(5),
                         new DigitToken("4"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(5))
                 }
@@ -200,7 +209,8 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(4),
                         new DigitToken("4"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(4))
                 }
@@ -219,7 +229,8 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello"),
                         new ItalicsTagToken(3)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(3))
                 }
@@ -238,7 +249,8 @@ public class ItalicsTagValidatorTests
                         new EscapeToken(),
                         new ItalicsTagToken(3)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(3))
                 }
@@ -258,7 +270,8 @@ public class ItalicsTagValidatorTests
                         new TextToken("world!"),
                         new ItalicsTagToken(4)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(4))
                 }
@@ -279,7 +292,8 @@ public class ItalicsTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(2))
                 }
@@ -299,7 +313,8 @@ public class ItalicsTagValidatorTests
                         new ItalicsTagToken(3),
                         new TextToken("own")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(3))
                 }
@@ -320,7 +335,8 @@ public class ItalicsTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(1),
                         new ItalicsTagToken(3))
                 }
@@ -340,7 +356,8 @@ public class ItalicsTagValidatorTests
                         new TextToken("Hello"),
                         new ItalicsTagToken(4)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(2),
                         new ItalicsTagToken(4))
                 }
@@ -360,7 +377,8 @@ public class ItalicsTagValidatorTests
                         new EscapeToken(),
                         new ItalicsTagToken(4)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Italics,
                         new ItalicsTagToken(0),
                         new ItalicsTagToken(4))
                 }
@@ -373,6 +391,6 @@ public class ItalicsTagValidatorTests
     {
         public required List<IToken> Tokens { get; init; }
         
-        public required IPairedMarkdownTags PairedMarkdownTags { get; init; }
+        public required IPairedMarkdownTagTokens PairedMarkdownTags { get; init; }
     }
 }

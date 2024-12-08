@@ -2,6 +2,7 @@
 using Markdown.MarkdownTagValidators;
 using Markdown.Tokens;
 using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.MarkdownTagTokens;
 using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
@@ -34,7 +35,8 @@ public class BoldTagValidatorTests
                         new TextToken("Hello!"),
                         new BoldTagToken(3),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(3))
                 }
@@ -53,7 +55,8 @@ public class BoldTagValidatorTests
                         new TextToken("Hello!"),
                         new BoldTagToken(3),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(3))
                 }
@@ -75,7 +78,8 @@ public class BoldTagValidatorTests
                         new BoldTagToken(5),
                         new TextToken("rld!"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(5))
                 }
@@ -96,7 +100,8 @@ public class BoldTagValidatorTests
                         new BoldTagToken(4),
                         new TextToken("rld!"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(5))
                 }
@@ -117,7 +122,8 @@ public class BoldTagValidatorTests
                         new TextToken("world!"),
                         new BoldTagToken(5),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(5))
                 }
@@ -137,7 +143,8 @@ public class BoldTagValidatorTests
                         new DigitToken("3"),
                         new BoldTagToken(4),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(2), 
                         new BoldTagToken(4))
                 }
@@ -159,7 +166,8 @@ public class BoldTagValidatorTests
                         new DigitToken("4"),
                         new DigitToken("5"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(4))
                 }
@@ -181,7 +189,8 @@ public class BoldTagValidatorTests
                         new BoldTagToken(5),
                         new DigitToken("4"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(5))
                 }
@@ -202,7 +211,8 @@ public class BoldTagValidatorTests
                         new BoldTagToken(4),
                         new DigitToken("4"),
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(4))
                 }
@@ -221,7 +231,8 @@ public class BoldTagValidatorTests
                         new TextToken("Hello"),
                         new BoldTagToken(3)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(3))
                 }
@@ -240,7 +251,8 @@ public class BoldTagValidatorTests
                         new EscapeToken(),
                         new BoldTagToken(3)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(3))
                 }
@@ -261,7 +273,8 @@ public class BoldTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(2), 
                         new BoldTagToken(3))
                 }
@@ -286,7 +299,8 @@ public class BoldTagValidatorTests
                         new TextToken("world"),
                         new ItalicsTagToken(8)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                             new BoldTagToken(3), 
                             new BoldTagToken(5)),
                     ExternalTagType = MarkdownTagType.Italics
@@ -307,7 +321,8 @@ public class BoldTagValidatorTests
                         new TextToken("world!"),
                         new BoldTagToken(4)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(4))
                 }
@@ -328,7 +343,8 @@ public class BoldTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(2))
                 }
@@ -348,7 +364,8 @@ public class BoldTagValidatorTests
                         new BoldTagToken(3),
                         new TextToken("own")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(3))
                 }
@@ -369,7 +386,8 @@ public class BoldTagValidatorTests
                         new SpaceToken(),
                         new TextToken("world!")
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(1), 
                         new BoldTagToken(3))
                 }
@@ -389,7 +407,8 @@ public class BoldTagValidatorTests
                         new TextToken("Hello"),
                         new BoldTagToken(4)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(2), 
                         new BoldTagToken(4))
                 }
@@ -409,7 +428,8 @@ public class BoldTagValidatorTests
                         new EscapeToken(),
                         new BoldTagToken(4)
                     ],
-                    PairedMarkdownTags = new PairedMarkdownTags(
+                    PairedMarkdownTags = new PairedMarkdownTagTokens(
+                        MarkdownTagType.Bold,
                         new BoldTagToken(0), 
                         new BoldTagToken(4))
                 }
@@ -422,7 +442,7 @@ public class BoldTagValidatorTests
     {
         public required List<IToken> Tokens { get; init; }
         
-        public required IPairedMarkdownTags PairedMarkdownTags { get; init; }
+        public required IPairedMarkdownTagTokens PairedMarkdownTags { get; init; }
 
         public MarkdownTagType? ExternalTagType { get; init; }
     }

@@ -3,6 +3,7 @@ using Markdown.MarkdownTags;
 using Markdown.MarkdownTagValidators;
 using Markdown.Tokens;
 using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.MarkdownTagTokens;
 using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
@@ -20,7 +21,7 @@ public class HeadingTagValidatorTests
         
         var isValidTag = markdownTagValidator.IsValidSingleTag(
             paragraphOfTokens, 
-            new SingleMarkdownTag(new HeadingTagToken(1)));
+            new SingleMarkdownTagToken(MarkdownTagType.Heading, new HeadingTagToken(1)));
         
         isValidTag.Should().BeFalse();
     }
@@ -32,7 +33,7 @@ public class HeadingTagValidatorTests
         
         var isValidTag = markdownTagValidator.IsValidSingleTag(
             paragraphOfTokens, 
-            new SingleMarkdownTag(new HeadingTagToken(0)));
+            new SingleMarkdownTagToken(MarkdownTagType.Heading, new HeadingTagToken(0)));
         
         isValidTag.Should().BeFalse();
     }
@@ -47,7 +48,7 @@ public class HeadingTagValidatorTests
         
         var isValid = markdownTagValidator.IsValidSingleTag(
             paragraphOfTokens,
-            new SingleMarkdownTag(new HeadingTagToken(0)));
+            new SingleMarkdownTagToken(MarkdownTagType.Heading, new HeadingTagToken(0)));
 
         isValid.Should().BeTrue();
     }
