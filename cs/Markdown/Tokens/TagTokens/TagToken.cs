@@ -12,23 +12,23 @@ public abstract class TagToken : IToken
     
     public abstract int PositionInTokens { get; }
 
-    public static bool TryCreateTagToken(string line, int position, out TagToken? tagToken)
+    public static bool TryCreateTagToken(string line, int positionInLine, int positionInTokens, out TagToken? tagToken)
     {
-        if (BoldTagToken.IsBoldTagToken(line, position))
+        if (BoldTagToken.IsBoldTagToken(line, positionInLine))
         {
-            tagToken = new BoldTagToken(position);
+            tagToken = new BoldTagToken(positionInTokens);
             return true;
         }
 
-        if (ItalicsTagToken.IsItalicsTagToken(line, position))
+        if (ItalicsTagToken.IsItalicsTagToken(line, positionInLine))
         {
-            tagToken = new ItalicsTagToken(position);
+            tagToken = new ItalicsTagToken(positionInTokens);
             return true;
         }
         
-        if (HeadingTagToken.IsHeadingTagToken(line, position))
+        if (HeadingTagToken.IsHeadingTagToken(line, positionInLine))
         {
-            tagToken = new HeadingTagToken(position);
+            tagToken = new HeadingTagToken(positionInTokens);
             return true;
         }
 
