@@ -1,6 +1,4 @@
-﻿using Markdown.MarkdownTags;
-
-namespace Markdown.Tokens.TagTokens;
+﻿namespace Markdown.Tokens.TagTokens;
 
 public class ItalicsTagToken : TagToken
 {
@@ -9,14 +7,14 @@ public class ItalicsTagToken : TagToken
         PositionInTokens = positionInTokens;
     }
 
-    private const string ItalicsTag = "_";
+    public const string ItalicsTokenContent = "_";
 
-    public override string Content => ItalicsTag;
+    public override string Content => ItalicsTokenContent;
     
     public override int PositionInTokens { get; }
 
     public static bool IsItalicsTagToken(string line, int position)
     {
-        return line[position].ToString() == ItalicsTag;
+        return line[position].ToString() == ItalicsTokenContent;
     }
 }

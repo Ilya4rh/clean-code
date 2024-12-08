@@ -1,6 +1,4 @@
-﻿using Markdown.MarkdownTags;
-
-namespace Markdown.Tokens.TagTokens;
+﻿namespace Markdown.Tokens.TagTokens;
 
 public class HeadingTagToken : TagToken
 {
@@ -9,14 +7,14 @@ public class HeadingTagToken : TagToken
         PositionInTokens = positionInTokens;
     }
 
-    private const string HeadingTag = "#";
+    public const string HeadingTokenContent = "#";
 
-    public override string Content => HeadingTag;
+    public override string Content => HeadingTokenContent;
     
     public override int PositionInTokens { get; }
 
     public static bool IsHeadingTagToken(string line, int position)
     {
-        return line[position].ToString() == HeadingTag;
+        return line[position].ToString() == HeadingTokenContent;
     }
 }
