@@ -46,7 +46,7 @@ public class PairedMarkdownTagTokens : IPairedMarkdownTagTokens
     public static bool TryCreate(
         TagToken opening,
         TagToken closing,
-        out PairedMarkdownTagTokens? pairedMarkdownTagTokens)
+        out IPairedMarkdownTagTokens? pairedMarkdownTagTokens)
     {
         if (opening.Content != closing.Content)
         {
