@@ -17,7 +17,13 @@ public class PairedMarkdownTagTokens : IPairedMarkdownTagTokens
     public TagToken Opening { get; }
     
     public TagToken Closing { get; }
-    
+
+    public IEnumerable<MarkdownTag> ConvertToMarkdownTags()
+    {
+        yield return new MarkdownTag(Opening, TagType);
+        yield return new MarkdownTag(Closing, TagType, true);
+    }
+
     public bool IsIntersect(IPairedMarkdownTagTokens pairedMarkdownTagTokens)
     {
         if (IsExternalFor(pairedMarkdownTagTokens) || pairedMarkdownTagTokens.IsExternalFor(this))

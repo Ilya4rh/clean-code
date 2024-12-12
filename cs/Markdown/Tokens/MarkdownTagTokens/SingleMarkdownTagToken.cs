@@ -13,11 +13,14 @@ public class SingleMarkdownTagToken : ISingleMarkdownTagToken
 
     public TagToken Token { get; }
     
+    public MarkdownTag ConvertToMarkdownTag()
+    {
+        return new MarkdownTag(Token, TagType);
+    }
+
     public MarkdownTagType TagType { get; }
     
-    public static bool TryCreate(
-        TagToken tagToken, 
-        out SingleMarkdownTagToken? singleMarkdownTagToken)
+    public static bool TryCreate(TagToken tagToken, out SingleMarkdownTagToken? singleMarkdownTagToken)
     {
         if (tagToken.Content == HeadingTagToken.HeadingTokenContent)
         {
