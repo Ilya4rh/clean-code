@@ -18,114 +18,77 @@ public class TokensParser : ITokensParser
     public IEnumerable<MarkdownTag> ParserMarkdownTags(List<IToken> paragraphOfTokens)
     {
         var tagTokens = GetTagTokens(paragraphOfTokens).ToList();
-        
-        var singleTags = ParseSingleTags(tagTokens, paragraphOfTokens);
-        var pairedTags = ParsePairedTags(tagTokens, paragraphOfTokens);
-
-        var tags = new List<MarkdownTag>();
-        tags.AddRange(singleTags);
-        tags.AddRange(pairedTags);
-
-        return tags;
-    }
-
-    private IEnumerable<MarkdownTag> ParseSingleTags(
-        IEnumerable<TagToken> tagTokens, 
-        List<IToken> paragraphOfTokens)
-    {
-        foreach (var tagToken in tagTokens)
-        {
-            if (!SingleMarkdownTagToken.TryCreate(tagToken, out var singleMarkdownTagToken))
-            {
-                continue;
-            }
-            
-            if (validator.IsValidSingleTag(paragraphOfTokens, singleMarkdownTagToken!))
-            {
-                yield return new MarkdownTag(tagToken, singleMarkdownTagToken!.TagType);
-            }
-        }
-    }
-
-    private IEnumerable<MarkdownTag> ParsePairedTags(
-        List<TagToken> tagTokens,
-        List<IToken> paragraphOfTokens)
-    {
         var positionAddedTokens = new HashSet<int>();
-        PairedMarkdownTagTokens? previousPairedTags = null;
+        IPairedMarkdownTagTokens? previousPaired = null;
+        var tags = new List<MarkdownTag>();
 
         for (var i = 0; i < tagTokens.Count; i++)
         {
-            if (!positionAddedTokens.Add(i))
+            if (!positionAddedTokens.Add(i)) continue;
+            
+            if (TryCreateSingleMarkdownTag(paragraphOfTokens, tagTokens[i], out var markdownTag))
+            {
+                tags.Add(markdownTag!);
                 continue;
+            }
 
             for (var j = i + 1; j < tagTokens.Count; j++)
             {
-                if (positionAddedTokens.Contains(j))
-                    continue;
-
-                var isComplete = TryCompleteValidPairedMarkdownTagTokens(
-                    paragraphOfTokens,
-                    previousPairedTags,
-                    tagTokens[i],
-                    tagTokens[j],
-                    out var currentPairedTags);
-
-                if (previousPairedTags == null)
-                {
-                    if (isComplete)
-                    {
-                        previousPairedTags = currentPairedTags;
-                        positionAddedTokens.Add(j);
-                        break;
-                    }
-                    continue;
-                }
-
-                if (isComplete && previousPairedTags.IsIntersect(currentPairedTags!))
-                {
-                    previousPairedTags = null;
-                    continue;
-                }
+                if (positionAddedTokens.Contains(j)) continue;
                 
-                yield return new MarkdownTag(previousPairedTags.Opening, previousPairedTags.TagType);
-                yield return new MarkdownTag(previousPairedTags.Closing, previousPairedTags.TagType, true);
-                previousPairedTags = currentPairedTags;
+                if (!PairedMarkdownTagTokens.TryCreate(tagTokens[i], tagTokens[j], out var currentPaired) || 
+                    !IsValidPairedMarkdownTagTokens(paragraphOfTokens, previousPaired, currentPaired!))
+                    continue;
+
                 positionAddedTokens.Add(j);
-                break;
+                
+                if (previousPaired != null && previousPaired.IsIntersect(currentPaired!))
+                {
+                    previousPaired = null;
+                    continue;
+                }
+                if (previousPaired != null) tags.AddRange(previousPaired.ConvertToMarkdownTags());
+                
+                previousPaired = currentPaired;
             }
         }
 
-        if (previousPairedTags == null) 
-            yield break;
+        if (previousPaired != null) tags.AddRange(previousPaired.ConvertToMarkdownTags());
         
-        yield return new MarkdownTag(previousPairedTags.Opening, previousPairedTags.TagType);
-        yield return new MarkdownTag(previousPairedTags.Closing, previousPairedTags.TagType, true);
+        return tags;
     }
 
-    private bool TryCompleteValidPairedMarkdownTagTokens(
-        List<IToken> paragraphOfTokens,
-        PairedMarkdownTagTokens? previousPairedTags,
-        TagToken openingTagToken,
-        TagToken closingTagToken,
-        out PairedMarkdownTagTokens? pairedMarkdownTagTokens)
+    private bool TryCreateSingleMarkdownTag(
+        List<IToken> paragraphOfTokens, 
+        TagToken tagToken,
+        out MarkdownTag? markdownTag)
     {
-        if (!PairedMarkdownTagTokens.TryCreate(openingTagToken, closingTagToken, out pairedMarkdownTagTokens))
+        if (!SingleMarkdownTagToken.TryCreate(tagToken, out var singleMarkdownTagToken) || 
+            !validator.IsValidSingleTag(paragraphOfTokens, singleMarkdownTagToken!))
         {
+            markdownTag = null;
             return false;
         }
-
-        MarkdownTagType? externalTagType =
-            previousPairedTags != null && previousPairedTags.IsExternalFor(pairedMarkdownTagTokens!)
-                ? previousPairedTags.TagType
-                : null;
-
-        if (!validator.IsValidPairedTag(paragraphOfTokens, pairedMarkdownTagTokens!, externalTagType))
-            return false;
-        
+            
+        markdownTag = singleMarkdownTagToken!.ConvertToMarkdownTag();
         return true;
     }
-    
+
+    private bool IsValidPairedMarkdownTagTokens(
+        List<IToken> paragraphOfTokens,
+        IPairedMarkdownTagTokens? previousPaired,
+        IPairedMarkdownTagTokens currentPaired)
+    {
+        MarkdownTagType? externalTagType = null;
+        
+        if (previousPaired != null && previousPaired.IsExternalFor(currentPaired))
+        {
+            externalTagType = previousPaired.TagType;
+        }
+
+        return validator.IsValidPairedTag(paragraphOfTokens, currentPaired, externalTagType);
+    }
+
     private static IEnumerable<TagToken> GetTagTokens(IEnumerable<IToken> tokens)
     {
         return tokens
