@@ -42,13 +42,13 @@ public class TokensParser : ITokensParser
 
                 positionAddedTokens.Add(j);
                 
-                if (previousPaired != null && previousPaired.IsIntersect(currentPaired!))
+                if (previousPaired == null || previousPaired.IsIntersect(currentPaired!))
                 {
-                    previousPaired = null;
+                    previousPaired = previousPaired != null ? null : currentPaired;
                     continue;
                 }
-                if (previousPaired != null) tags.AddRange(previousPaired.ConvertToMarkdownTags());
                 
+                tags.AddRange(previousPaired.ConvertToMarkdownTags());
                 previousPaired = currentPaired;
             }
         }
