@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using Markdown.Converters;
 using Markdown.MarkdownTags;
+using Markdown.Tokens;
+using Markdown.Tokens.CommonTokens;
+using Markdown.Tokens.TagTokens;
 using NUnit.Framework;
 
 namespace MarkdownTests;
@@ -9,99 +12,164 @@ namespace MarkdownTests;
 public class HtmlConverterTests
 {
     private IHtmlConverter htmlConverter;
-
+    
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         htmlConverter = new HtmlConverter();
     }
-    
-    [Test]
-    public void Convert_ReturnOriginalString_WhenWereNoTags()
+
+    [TestCaseSource(nameof(_testCases))]
+    public void Test(TestCase testCase, Expected expected)
     {
-        var markdownLine = "Здесь нет тегов";
+        var htmlSting = htmlConverter.Convert(testCase.TokensInParagraph, testCase.TagsInParagraph);
 
-        var htmlLine = htmlConverter.Convert([], markdownLine);
-
-        htmlLine.Should().Be(markdownLine);
-    }
-    
-    [Test]
-    public void Convert_ShouldWrapLineWithHeadingTags_WhenHeadingTagProvided()
-    {
-        var markdownLine = "# Текст с заголовком";
-        var tags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Heading, 0, 1)
-        };
-
-        var htmlLine = htmlConverter.Convert(tags, markdownLine);
-
-        htmlLine.Should().Be(@"\<h1>Текст с заголовком\</h1>");
+        htmlSting.Should().Be(expected.HtmlString);
     }
 
-    [Test]
-    public void Convert_ShouldApplyBoldTag_WhenBoldTagProvided()
+    private static IEnumerable<TestCaseData> _testCases = new[]
     {
-        var markdownLine = "Текст с __полужирным__ тегом";
-        var tags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Bold, 8, 2),
-            new(MarkdownTagType.Bold, 20, 2, true)
-        };
-
-        var htmlLine = htmlConverter.Convert(tags, markdownLine);
-
-        htmlLine.Should().Be(@"Текст с \<strong>полужирным\</strong> тегом");
-    }
-
-    [Test]
-    public void Convert_ShouldApplyItalicsTag_WhenItalicsTagProvided()
-    {
-        var markdownLine = "Текст с _курсивом_";
-        var tags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Italics, 8, 1),
-            new(MarkdownTagType.Italics, 17, 1, true)
-        };
-
-        var htmlLine = htmlConverter.Convert(tags, markdownLine);
-
-        htmlLine.Should().Be(@"Текст с \<em>курсивом\</em>");
-    }
-
-    [Test]
-    public void Convert_ShouldHandleMultipleTags_WhenOneWordContainsAllTags()
-    {
-        var markdownLine = "# ___Привет___";
-        var tags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Heading, 0, 1),
-            new(MarkdownTagType.Bold, 2, 2),
-            new(MarkdownTagType.Italics, 4, 1),
-            new(MarkdownTagType.Italics, 11, 1, true),
-            new(MarkdownTagType.Bold, 12, 2, true)
-        };
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    TokensInParagraph = 
+                    [
+                        new TextToken("Здесь"),
+                        new SpaceToken(),
+                        new TextToken("нет"),
+                        new SpaceToken(),
+                        new TextToken("тегов")
+                    ],
+                    TagsInParagraph = []
+                },
+                new Expected
+                {
+                    HtmlString = "Здесь нет тегов"
+                })
+            .SetName("01. Начальная строка: 'Здесь нет тегов'. В строке отсутствуют теги."),
         
-        var htmlLine = htmlConverter.Convert(tags, markdownLine);
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    TokensInParagraph = 
+                    [
+                        new HeadingTagToken(0),
+                        new SpaceToken(),
+                        new TextToken("Текст"),
+                        new SpaceToken(),
+                        new TextToken("с"),
+                        new SpaceToken(),
+                        new TextToken("заголовком")
+                    ],
+                    TagsInParagraph = [new MarkdownTag(new HeadingTagToken(0), MarkdownTagType.Heading)]
+                },
+                new Expected
+                {
+                    HtmlString = "<h1>Текст с заголовком</h1>"
+                })
+            .SetName("02. Начальная строка: '# Текст с заголовком'. В строке единственный тег-заголовок."),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    TokensInParagraph = 
+                    [
+                        new TextToken("Текст"),
+                        new SpaceToken(),
+                        new TextToken("с"),
+                        new SpaceToken(),
+                        new BoldTagToken(4),
+                        new TextToken("полужирным"),
+                        new BoldTagToken(6),
+                        new SpaceToken(),
+                        new TextToken("тегом")
+                    ],
+                    TagsInParagraph = 
+                    [
+                        new MarkdownTag(new BoldTagToken(4), MarkdownTagType.Bold),
+                        new MarkdownTag(new BoldTagToken(6), MarkdownTagType.Bold, true),
+                    ]
+                },
+                new Expected
+                {
+                    HtmlString = "Текст с <strong>полужирным</strong> тегом"
+                })
+            .SetName("03. Начальная строка: 'Текст с __полужирным__ тегом'. В строке единственный тег-полужирный."),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    TokensInParagraph = 
+                    [
+                        new TextToken("Текст"),
+                        new SpaceToken(),
+                        new TextToken("с"),
+                        new SpaceToken(),
+                        new ItalicsTagToken(4),
+                        new TextToken("курсивом"),
+                        new ItalicsTagToken(6),
+                    ],
+                    TagsInParagraph = 
+                    [
+                        new MarkdownTag(new ItalicsTagToken(4), MarkdownTagType.Italics),
+                        new MarkdownTag(new ItalicsTagToken(6), MarkdownTagType.Italics, true),
+                    ]
+                },
+                new Expected
+                {
+                    HtmlString = "Текст с <em>курсивом</em>"
+                })
+            .SetName("04. Начальная строка: 'Текст с _курсивом_'. В строке единственный тег-курсив."),
+        
+        new TestCaseData
+            (
+                new TestCase
+                {
+                    TokensInParagraph = 
+                    [
+                        new HeadingTagToken(0),
+                        new SpaceToken(),
+                        new TextToken("Заголовок"),
+                        new SpaceToken(),
+                        new BoldTagToken(4),
+                        new TextToken("с"),
+                        new SpaceToken(),
+                        new ItalicsTagToken(7),
+                        new TextToken("разными"),
+                        new ItalicsTagToken(9),
+                        new SpaceToken(),
+                        new TextToken("символами"),
+                        new BoldTagToken(12),
+                    ],
+                    TagsInParagraph = 
+                    [
+                        new MarkdownTag(new HeadingTagToken(0), MarkdownTagType.Heading),
+                        new MarkdownTag(new BoldTagToken(4), MarkdownTagType.Bold),
+                        new MarkdownTag(new BoldTagToken(12), MarkdownTagType.Bold, true),
+                        new MarkdownTag(new ItalicsTagToken(7), MarkdownTagType.Italics),
+                        new MarkdownTag(new ItalicsTagToken(9), MarkdownTagType.Italics, true),
+                    ]
+                },
+                new Expected
+                {
+                    HtmlString = "<h1>Заголовок <strong>с <em>разными</em> символами</strong></h1>"
+                })
+            .SetName("05. Начальная строка: '# Заголовок __с _разными_ символами__'. В строке присутствуют все типы тегов."),
+    };
 
-        htmlLine.Should().Be(@"\<h1>\<strong>\<em>Привет\</em>\</strong>\</h1>");
+    public record TestCase
+    {
+        public required IEnumerable<IToken> TokensInParagraph { get; init; }
+        
+        public required IEnumerable<MarkdownTag> TagsInParagraph { get; init; }
     }
 
-    [Test]
-    public void Convert_ShouldHandleNestedTags_WhenItalicsTagsInBoldTags()
+    public record Expected
     {
-        var markdownLine = "__Тут _курсив_ внутри полужирного__";
-        var tags = new List<MarkdownTag>
-        {
-            new(MarkdownTagType.Bold, 0, 2),
-            new(MarkdownTagType.Italics, 6, 1),
-            new(MarkdownTagType.Italics, 13, 1, true),
-            new(MarkdownTagType.Bold, 33, 2, true)
-        };
-        
-        var htmlLine = htmlConverter.Convert(tags, markdownLine);
-
-        htmlLine.Should().Be(@"\<strong>Тут \<em>курсив\</em> внутри полужирного\</strong>");
+        public required string HtmlString { get; init; }
     }
 }
