@@ -4,5 +4,6 @@ public enum MarkdownTagType
 {
     Italics,
     Bold,
-    Heading
+    Heading,
+    MarkedList
 }

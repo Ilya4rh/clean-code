@@ -13,7 +13,7 @@ public class MarkdownTagValidator : IMarkdownTagValidator
     {
         return singleTag.TagType switch
         {
-            MarkdownTagType.Heading => IsValidHeadingTag(singleTag.Token, paragraphOfTokens),
+            MarkdownTagType.Heading or MarkdownTagType.MarkedList => IsValidSingleTag(singleTag.Token, paragraphOfTokens),
             _ => false
         };
     }
@@ -31,7 +31,7 @@ public class MarkdownTagValidator : IMarkdownTagValidator
         };
     }
     
-    private static bool IsValidHeadingTag(TagToken tagToken, List<IToken> paragraphOfTokens)
+    private static bool IsValidSingleTag(TagToken tagToken, List<IToken> paragraphOfTokens)
     {
         var position = tagToken.PositionInTokens;
 
