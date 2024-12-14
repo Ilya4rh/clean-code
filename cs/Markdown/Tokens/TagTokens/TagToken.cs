@@ -1,6 +1,4 @@
-﻿using Markdown.MarkdownTags;
-
-namespace Markdown.Tokens.TagTokens;
+﻿namespace Markdown.Tokens.TagTokens;
 
 public abstract class TagToken : IToken
 {
@@ -27,6 +25,12 @@ public abstract class TagToken : IToken
         if (HeadingTagToken.IsHeadingTagToken(line, positionInLine))
         {
             tagToken = new HeadingTagToken(positionInTokens);
+            return true;
+        }
+
+        if (MarkedListTagToken.IsMarkedListTagToken(line, positionInLine))
+        {
+            tagToken = new MarkedListTagToken(positionInTokens);
             return true;
         }
 
