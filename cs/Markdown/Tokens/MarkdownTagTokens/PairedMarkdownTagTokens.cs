@@ -56,10 +56,10 @@ public class PairedMarkdownTagTokens : IPairedMarkdownTagTokens
 
         switch (opening.Content)
         {
-            case BoldTagToken.BoldTokenContent:
+            case MarkdownTagContentConstants.Bold:
                 pairedMarkdownTagTokens = new PairedMarkdownTagTokens(MarkdownTagType.Bold, opening, closing);
                 return true;
-            case ItalicsTagToken.ItalicsTokenContent:
+            case MarkdownTagContentConstants.Italics:
                 pairedMarkdownTagTokens = new PairedMarkdownTagTokens(MarkdownTagType.Italics, opening, closing);
                 return true;
             default:

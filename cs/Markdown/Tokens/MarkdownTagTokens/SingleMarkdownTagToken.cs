@@ -22,7 +22,7 @@ public class SingleMarkdownTagToken : ISingleMarkdownTagToken
     
     public static bool TryCreate(TagToken tagToken, out ISingleMarkdownTagToken? singleMarkdownTagToken)
     {
-        if (tagToken.Content == HeadingTagToken.HeadingTokenContent)
+        if (tagToken.Content == MarkdownTagContentConstants.Heading)
         {
             singleMarkdownTagToken = new SingleMarkdownTagToken(MarkdownTagType.Heading, tagToken);
             return true;
