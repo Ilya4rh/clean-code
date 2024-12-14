@@ -1,7 +1,4 @@
-﻿using Markdown.MarkdownTags;
-using Markdown.Tokens;
-
-namespace Markdown.Converters;
+﻿namespace Markdown.Converters;
 
 public interface IHtmlConverter
 {
