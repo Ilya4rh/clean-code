@@ -1,31 +1,34 @@
 ﻿using Markdown.Converters;
-using Markdown.Parsers;
+using Markdown.Parsers.MarkdownLineParsers;
+using Markdown.Parsers.TokensParsers;
 
 namespace Markdown;
 
 public class Md
 {
     private readonly IMarkdownLineParser markdownLineParser;
+    private readonly ITokensParser tokensParser;
     private readonly IHtmlConverter htmlConverter;
 
-    public Md(IMarkdownLineParser markdownLineParser, IHtmlConverter htmlConverter)
+    public Md(IMarkdownLineParser markdownLineParser, IHtmlConverter htmlConverter, ITokensParser tokensParser)
     {
         this.markdownLineParser = markdownLineParser;
         this.htmlConverter = htmlConverter;
+        this.tokensParser = tokensParser;
     }
 
     public string Render(string markdownLine)
     {
         var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(markdownLine);
-        var htmlParagraphs = new List<string>();
         
-        foreach (var paragraph in paragraphs)
-        {
-            var tagsInParagraph = markdownLineParser.ParseMarkdownTags(paragraph);
-            var htmlLine = htmlConverter.Convert(tagsInParagraph, paragraph);
-            htmlParagraphs.Add(htmlLine);
-        }
+        var htmlParagraphs = (from paragraph in paragraphs
+            select markdownLineParser.ParseParagraphForTokens(paragraph)
+            into tokens
+            select tokens.ToList()
+            into paragraphOfTokens
+            let tags = tokensParser.ParserMarkdownTags(paragraphOfTokens)
+            select htmlConverter.Convert(paragraphOfTokens, tags)).ToList();
 
-        return string.Join('\n', htmlParagraphs);
+        return string.Join(Environment.NewLine, htmlParagraphs);
     }
 }
