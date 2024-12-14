@@ -15,9 +15,10 @@ public class TokensParser : ITokensParser
         this.validator = validator;
     }
 
-    public IEnumerable<MarkdownTag> ParserMarkdownTags(List<IToken> paragraphOfTokens)
+    public IEnumerable<MarkdownTag> ParserMarkdownTags(IEnumerable<IToken> paragraphOfTokens)
     {
-        var tagTokens = GetTagTokens(paragraphOfTokens).ToList();
+        var tokens = paragraphOfTokens.ToList(); 
+        var tagTokens = GetTagTokens(tokens).ToList();
         var positionAddedTokens = new HashSet<int>();
         IPairedMarkdownTagTokens? previousPaired = null;
         var tags = new List<MarkdownTag>();
@@ -26,7 +27,7 @@ public class TokensParser : ITokensParser
         {
             if (!positionAddedTokens.Add(i)) continue;
             
-            if (TryCreateSingleMarkdownTag(paragraphOfTokens, tagTokens[i], out var markdownTag))
+            if (TryCreateSingleMarkdownTag(tokens, tagTokens[i], out var markdownTag))
             {
                 tags.Add(markdownTag!);
                 continue;
@@ -37,7 +38,7 @@ public class TokensParser : ITokensParser
                 if (positionAddedTokens.Contains(j)) continue;
                 
                 if (!PairedMarkdownTagTokens.TryCreate(tagTokens[i], tagTokens[j], out var currentPaired) || 
-                    !IsValidPairedMarkdownTagTokens(paragraphOfTokens, previousPaired, currentPaired!))
+                    !IsValidPairedMarkdownTagTokens(tokens, previousPaired, currentPaired!))
                     continue;
 
                 positionAddedTokens.Add(j);
