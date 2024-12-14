@@ -38,6 +38,17 @@ public class MarkdownLineParser : IMarkdownLineParser
 
         return tokens;
     }
+    
+    public IEnumerable<string> ParseMarkdownTextIntoParagraphs(string markdownText)
+    {
+        var paragraphs = markdownText.Split(Environment.NewLine);
+
+        foreach (var paragraph in paragraphs)
+        {
+            if (!string.IsNullOrWhiteSpace(paragraph))
+                yield return paragraph;
+        }
+    }
 
     private static string CompleteTextTokenContent(string line, int positionInLine, int positionInTokens, TokenType tokenType)
     {
@@ -57,16 +68,5 @@ public class MarkdownLineParser : IMarkdownLineParser
         }
 
         return content.ToString();
-    }
-    
-    public IEnumerable<string> ParseMarkdownTextIntoParagraphs(string markdownText)
-    {
-        var paragraphs = markdownText.Split(Environment.NewLine);
-
-        foreach (var paragraph in paragraphs)
-        {
-            if (!string.IsNullOrWhiteSpace(paragraph))
-                yield return paragraph;
-        }
     }
 }
