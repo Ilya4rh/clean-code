@@ -1,6 +1,8 @@
 ﻿using Markdown.Converters;
+using Markdown.MarkdownTags;
 using Markdown.Parsers.MarkdownLineParsers;
 using Markdown.Parsers.TokensParsers;
+using Markdown.Tokens;
 
 namespace Markdown;
 
@@ -21,14 +23,14 @@ public class Md
     {
         var paragraphs = markdownLineParser.ParseMarkdownTextIntoParagraphs(markdownLine);
         
-        var htmlParagraphs = (from paragraph in paragraphs
-            select markdownLineParser.ParseParagraphForTokens(paragraph)
+        var markdownParagraphs = (from paragraph in paragraphs
+            select markdownLineParser.ParseParagraphForTokens(paragraph).ToList()
             into tokens
-            select tokens.ToList()
-            into paragraphOfTokens
-            let tags = tokensParser.ParserMarkdownTags(paragraphOfTokens)
-            select htmlConverter.Convert(paragraphOfTokens, tags)).ToList();
+            let tags = tokensParser.ParserMarkdownTags(tokens).ToList()
+            select new MarkdownParagraph { Tokens = tokens, Tags = tags }).ToList();
 
-        return string.Join(Environment.NewLine, htmlParagraphs);
+        var htmlText = htmlConverter.Convert(markdownParagraphs);
+        
+        return htmlText;
     }
 }
