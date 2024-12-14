@@ -19,14 +19,13 @@ public static class MarkdownPairedTagsValidatorHelper
             return false;
         if (IsTagsInsideTheTextWithNumbers(paragraphOfTokens, positionOpening, positionClosing))
             return false;
-        if (IsEscapedTag(paragraphOfTokens, positionOpening) ||
-            IsEscapedTag(paragraphOfTokens, positionClosing))
+        if (IsEscapedTag(paragraphOfTokens, positionOpening) || IsEscapedTag(paragraphOfTokens, positionClosing))
             return false;
         
         return true;
     }
-    
-    public static bool IsSpaceAfterTagToken(List<IToken> paragraphOfTokens, int tagTokenPosition)
+
+    private static bool IsSpaceAfterTagToken(List<IToken> paragraphOfTokens, int tagTokenPosition)
     {
         if (tagTokenPosition == paragraphOfTokens.Count - 1)
             return false;
@@ -35,8 +34,8 @@ public static class MarkdownPairedTagsValidatorHelper
 
         return nextToken.Type == TokenType.Space;
     }
-    
-    public static bool IsSpaceBeforeTagToken(List<IToken> paragraphOfTokens, int tagTokenPosition)
+
+    private static bool IsSpaceBeforeTagToken(List<IToken> paragraphOfTokens, int tagTokenPosition)
     {
         if (tagTokenPosition == 0)
             return false;
@@ -46,7 +45,7 @@ public static class MarkdownPairedTagsValidatorHelper
         return previousToken.Type == TokenType.Space;
     }
 
-    public static bool IsTagsInDifferentWords(
+    private static bool IsTagsInDifferentWords(
         List<IToken> paragraphOfTokens, 
         int positionOpeningTagToken, 
         int positionClosingTagToken)
@@ -66,7 +65,7 @@ public static class MarkdownPairedTagsValidatorHelper
         return tokensBetweenTags.Any(token => token.Type == TokenType.Space);
     }
 
-    public static bool IsTagsInsideTheTextWithNumbers(
+    private static bool IsTagsInsideTheTextWithNumbers(
         List<IToken> paragraphOfTokens, 
         int positionOpeningTagToken, 
         int positionClosingTagToken)
@@ -82,13 +81,13 @@ public static class MarkdownPairedTagsValidatorHelper
         return false;
     }
 
-    public static bool IsTagOnNumber(List<IToken> paragraphOfTokens, int tagTokenPosition)
+    private static bool IsTagOnNumber(List<IToken> paragraphOfTokens, int tagTokenPosition)
     {
         return paragraphOfTokens[tagTokenPosition - 1].Type == TokenType.Digit && 
                paragraphOfTokens[tagTokenPosition + 1].Type == TokenType.Digit;
     }
 
-    public static bool IsEscapedTag(List<IToken> paragraphOfTokens, int tagPosition)
+    private static bool IsEscapedTag(List<IToken> paragraphOfTokens, int tagPosition)
     {
         if (tagPosition == 0)
             return false;
