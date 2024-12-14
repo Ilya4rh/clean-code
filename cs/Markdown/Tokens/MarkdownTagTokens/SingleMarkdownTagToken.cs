@@ -22,13 +22,17 @@ public class SingleMarkdownTagToken : ISingleMarkdownTagToken
     
     public static bool TryCreate(TagToken tagToken, out ISingleMarkdownTagToken? singleMarkdownTagToken)
     {
-        if (tagToken.Content == MarkdownTagContentConstants.Heading)
+        switch (tagToken.Content)
         {
-            singleMarkdownTagToken = new SingleMarkdownTagToken(MarkdownTagType.Heading, tagToken);
-            return true;
+            case MarkdownTagContentConstants.Heading:
+                singleMarkdownTagToken = new SingleMarkdownTagToken(MarkdownTagType.Heading, tagToken);
+                return true;
+            case MarkdownTagContentConstants.MarkedList:
+                singleMarkdownTagToken = new SingleMarkdownTagToken(MarkdownTagType.MarkedList, tagToken);
+                return true;
+            default:
+                singleMarkdownTagToken = null;
+                return false;
         }
-
-        singleMarkdownTagToken = null;
-        return false;
     }
 }

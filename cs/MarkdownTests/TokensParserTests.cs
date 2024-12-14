@@ -320,5 +320,53 @@ public class TokensParserTests
                     ]
                 })
             .SetName("08. Строка: '# __Hello _my_ world__'. В строке три типа тег-токенов, все они валидные."),
+        
+        new TestCaseData(
+                new TestCase
+                {
+                    ParagraphOfTokens =
+                    [
+                        new MarkedListTagToken(0),
+                        new SpaceToken(),
+                        new TextToken("Hello")
+                    ],
+                    ValidSingleMarkdownTags = 
+                    [
+                        new SingleMarkdownTagToken(MarkdownTagType.MarkedList, new MarkedListTagToken(0))
+                    ]
+                },
+                new Expected
+                {
+                    Tags = [new MarkdownTag(new MarkedListTagToken(0), MarkdownTagType.MarkedList)]
+                })
+            .SetName("09. Строка: '* Hello'. В строке единственный валидный тег - маркированный список."), 
+        
+        new TestCaseData(
+                new TestCase
+                {
+                    ParagraphOfTokens =
+                    [
+                        new MarkedListTagToken(0),
+                        new SpaceToken(),
+                        new TextToken("Hello"),
+                        new SpaceToken(),
+                        new MarkedListTagToken(4),
+                        new SpaceToken(),
+                        new TextToken("world")
+                    ],
+                    ValidSingleMarkdownTags = 
+                    [
+                        new SingleMarkdownTagToken(MarkdownTagType.MarkedList, new MarkedListTagToken(0))
+                    ],
+                    InvalidSingleMarkdownTags = 
+                    [
+                        new SingleMarkdownTagToken(MarkdownTagType.MarkedList, new MarkedListTagToken(4))
+                    ]
+                },
+                new Expected
+                {
+                    Tags = [new MarkdownTag(new MarkedListTagToken(0), MarkdownTagType.MarkedList)]
+                })
+            .SetName("10. Строка: '* Hello * world'. В строке два тега - маркированный список: валидный и невалидный."), 
     };
 }
