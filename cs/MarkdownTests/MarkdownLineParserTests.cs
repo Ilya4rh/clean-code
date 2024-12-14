@@ -43,6 +43,16 @@ public class MarkdownLineParserTests
     }
     
     [Test]
+    public void ParseParagraphForTokens_ShouldDefineMarkedListTagToken()
+    {
+        const string paragraph = "*";
+        
+        var paragraphOfTokens = markdownLineParser.ParseParagraphForTokens(paragraph);
+
+        paragraphOfTokens.Should().BeEquivalentTo([new MarkedListTagToken(0)]);
+    }
+    
+    [Test]
     public void ParseParagraphForTokens_ShouldDefineDigitToken()
     {
         const string paragraph = "1";
@@ -90,7 +100,7 @@ public class MarkdownLineParserTests
     public void ParseParagraphForTokens_ShouldDefineAllTokens()
     {
         const string paragraph = @"# _Hello_ __world1\__";
-        var expectedTokens = new List<IToken>()
+        var expectedTokens = new List<IToken>
         {
             new HeadingTagToken(0),
             new SpaceToken(),
