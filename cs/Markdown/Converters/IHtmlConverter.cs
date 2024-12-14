@@ -5,5 +5,5 @@ namespace Markdown.Converters;
 
 public interface IHtmlConverter
 {
-    string Convert(IEnumerable<IToken> tokensInParagraph, IEnumerable<MarkdownTag> tagsInParagraph);
+    string Convert(List<MarkdownParagraph> markdownParagraphs);
 }

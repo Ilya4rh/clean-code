@@ -7,50 +7,80 @@ namespace Markdown.Converters;
 
 public class HtmlConverter : IHtmlConverter
 {
-    public string Convert(IEnumerable<IToken> tokensInParagraph, IEnumerable<MarkdownTag> tagsInParagraph)
+    public string Convert(List<MarkdownParagraph> markdownParagraphs)
     {
-        var tagsSortingByPosition = tagsInParagraph
+        var htmlParagraphs = new List<string>();
+
+        for (var i = 0; i < markdownParagraphs.Count; i++)
+        {
+            var paragraph = markdownParagraphs[i];
+            if (paragraph.Tags.Count == 0)
+            {
+                htmlParagraphs.Add(CollectStringOfOnlyCommonTokens(paragraph.Tokens, 0, paragraph.Tokens.Count));
+                continue;
+            }
+            
+            if (IsFirstParagraphOfMarkedList(markdownParagraphs, i))
+                htmlParagraphs.Add(HtmlTagContentConstants.OpeningBoardMarkedList);
+            
+            htmlParagraphs.Add(CollectStringOfTokensWithTags(paragraph.Tokens, paragraph.Tags));
+            
+            if (IsLastParagraphOfMarkedList(markdownParagraphs, i))
+                htmlParagraphs.Add(HtmlTagContentConstants.ClosingBoardMarkedList);
+        }
+
+        return string.Join(Environment.NewLine, htmlParagraphs);
+    }
+
+    private static string CollectStringOfTokensWithTags(
+        List<IToken> tokens, 
+        List<MarkdownTag> tags)
+    {
+        var htmlString = new StringBuilder();
+        var tagsSortingByPosition = tags
             .OrderBy(tag => tag.Token.PositionInTokens)
             .ToArray();
-        var tokens = tokensInParagraph.ToArray();
-        var htmlString = new StringBuilder();
-        var firstTag = tagsSortingByPosition.FirstOrDefault();
+        var firstTag = tagsSortingByPosition.First();
         var previousTag = firstTag;
-        var previousTagPosition = firstTag == null ? tokens.Length : firstTag.Token.PositionInTokens;
 
-        htmlString.Append(ConvertCommonTokensToString(tokens, 0, previousTagPosition));
+        if (firstTag.Token.PositionInTokens > 0)
+            htmlString.Append(CollectStringOfOnlyCommonTokens(tokens, endIndex: firstTag.Token.PositionInTokens));
 
-        if (firstTag != null)
-            htmlString.Append(GetHtmlTag(firstTag) ?? "");
-
+        htmlString.Append(GetHtmlTag(firstTag) ?? "");
+        
         for (var i = 1; i < tagsSortingByPosition.Length; i++)
         {
             var currentTag = tagsSortingByPosition[i];
-            var commonTokensStartIndex = CalculateCommonTokensStartIndex(previousTag!);
+            var commonTokensStartIndex = CalculateCommonTokensStartIndex(previousTag);
             var commonTokensOnString =
-                ConvertCommonTokensToString(tokens, commonTokensStartIndex, currentTag.Token.PositionInTokens);
+                CollectStringOfOnlyCommonTokens(tokens, commonTokensStartIndex, currentTag.Token.PositionInTokens);
             
             htmlString.Append(commonTokensOnString).Append(GetHtmlTag(currentTag) ?? "");
             previousTag = currentTag;
         }
 
-        if (previousTag != null)
+        if (previousTag.Token.PositionInTokens < tokens.Count)
         {
             var commonTokensStartIndex = CalculateCommonTokensStartIndex(previousTag);
-            htmlString.Append(ConvertCommonTokensToString(tokens, commonTokensStartIndex, tokens.Length));
+            htmlString.Append(CollectStringOfOnlyCommonTokens(tokens, commonTokensStartIndex));
         }
-
-        if (firstTag is { TagType: MarkdownTagType.Heading })
-            htmlString.Append(GetHtmlTag(firstTag, true));
+        if (firstTag is { TagType: MarkdownTagType.Heading or MarkdownTagType.MarkedList })
+            htmlString.Append(GetHtmlTag(firstTag, true) ?? "");
         
         return htmlString.ToString();
     }
-
-    private static string ConvertCommonTokensToString(IToken[] tokensInParagraph, int startIndex, int endIndex)
+    
+    private static string CollectStringOfOnlyCommonTokens(
+        List<IToken> tokensInParagraph, 
+        int? startIndex = null, 
+        int? endIndex = null)
     {
+        startIndex ??= 0;
+        endIndex ??= tokensInParagraph.Count;
+        
         var tokensOnString = new StringBuilder();
 
-        for (var i = startIndex; i < endIndex; i++)
+        for (var i = startIndex.Value; i < endIndex.Value; i++)
         {
             tokensOnString.Append(tokensInParagraph[i].Content);
         }
@@ -60,10 +90,46 @@ public class HtmlConverter : IHtmlConverter
 
     private static int CalculateCommonTokensStartIndex(MarkdownTag tagBeforeCommonTokens)
     {
-        if (tagBeforeCommonTokens.TagType == MarkdownTagType.Heading)
+        if (tagBeforeCommonTokens.TagType is MarkdownTagType.Heading or MarkdownTagType.MarkedList)
             return tagBeforeCommonTokens.Token.PositionInTokens + 2;
         
         return tagBeforeCommonTokens.Token.PositionInTokens + 1;
+    }
+
+    private static bool IsFirstParagraphOfMarkedList(List<MarkdownParagraph> tagParagraphs, int indexCurrentParagraph)
+    {
+        var currentTagParagraph = tagParagraphs[indexCurrentParagraph].Tags;
+
+        if (currentTagParagraph.Count == 0 || currentTagParagraph[0].TagType != MarkdownTagType.MarkedList)
+            return false;
+        
+        if (indexCurrentParagraph == 0)
+            return true;
+
+        var previousTagParagraph = tagParagraphs[indexCurrentParagraph - 1].Tags;
+
+        if (previousTagParagraph.Count == 0)
+            return true;
+
+        return previousTagParagraph[0].TagType != MarkdownTagType.MarkedList;
+    }
+
+    private static bool IsLastParagraphOfMarkedList(List<MarkdownParagraph> tagParagraphs, int indexCurrentParagraph)
+    {
+        var currentTagParagraph = tagParagraphs[indexCurrentParagraph].Tags;
+
+        if (currentTagParagraph.Count == 0 || currentTagParagraph[0].TagType != MarkdownTagType.MarkedList)
+            return false;
+        
+        if (indexCurrentParagraph == tagParagraphs.Count - 1)
+            return true;
+
+        var nextTagParagraph = tagParagraphs[indexCurrentParagraph + 1].Tags;
+
+        if (nextTagParagraph.Count == 0)
+            return true;
+
+        return nextTagParagraph[0].TagType != MarkdownTagType.MarkedList;
     }
         
     private static string? GetHtmlTag(MarkdownTag markdownTag, bool isNeedClosingTagForSingle = false)
@@ -76,6 +142,8 @@ public class HtmlConverter : IHtmlConverter
             MarkdownTagType.Bold => HtmlTagContentConstants.BoldOpening,
             MarkdownTagType.Italics when markdownTag.IsClosedTag => HtmlTagContentConstants.ItalicsClosing,
             MarkdownTagType.Italics => HtmlTagContentConstants.ItalicsOpening,
+            MarkdownTagType.MarkedList when isNeedClosingTagForSingle => HtmlTagContentConstants.MarkedListClosing,
+            MarkdownTagType.MarkedList => HtmlTagContentConstants.MarkedListOpening,
             _ => null
         };
     }
