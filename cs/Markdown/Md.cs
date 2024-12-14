@@ -1,8 +1,6 @@
 ﻿using Markdown.Converters;
-using Markdown.MarkdownTags;
 using Markdown.Parsers.MarkdownLineParsers;
 using Markdown.Parsers.TokensParsers;
-using Markdown.Tokens;
 
 namespace Markdown;
 
